@@ -73,12 +73,14 @@ export class Query extends React.Component {
 
   onNext = results => {
     if (this.mounted) {
+      console.error("next", results);
       this.setState(results);
     }
   };
 
   onError = error => {
     if (this.mounted) {
+      console.error("error", error);
       this.setState({ error });
     }
   };

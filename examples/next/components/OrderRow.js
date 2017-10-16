@@ -2,12 +2,14 @@ import React from "react";
 import gql from "graphql-tag";
 import Link from "next/link";
 
-export const LoadingOrderRow = ({ offset }) => <span className="loading" />;
+export const LoadingOrderRow = ({ offset }) => <div className="loading" />;
 
 export const OrderRow = ({ id, name }) => (
-  <Link href={`?id=${id}`}>
-    <a>{name}</a>
-  </Link>
+  <div>
+    <Link href={`?id=${id}`}>
+      <a>{name}</a>
+    </Link>
+  </div>
 );
 
 OrderRow.fragments = {
