@@ -1,0 +1,24 @@
+{
+  "name": "next",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-client-preset": "0.2.0-beta.4",
+    "apollo-component": "../..",
+    "babel-polyfill": "^6.26.0",
+    "graphql": "^0.11.7",
+    "graphql-tag": "^2.4.2",
+    "next": "^4.1.0",
+    "prop-types": "^15.6.0",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0"
+  }
+}

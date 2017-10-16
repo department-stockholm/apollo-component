@@ -1,0 +1,31 @@
+{
+  "name": "apollo-component",
+  "version": "0.1.0",
+  "description": "",
+  "main": "dist/index.cjs.js",
+  "jsnext:main": "dist/index.esm.mjs",
+  "module": "dist/index.esm.mjs",
+  "scripts": {
+    "test": "jest",
+    "build": "rollup -c",
+    "prepare": "rollup -c"
+  },
+  "author": "Robert Sköld (https://department.se)",
+  "license": "ISC",
+  "peerDependencies": {
+    "prop-types": "*",
+    "react": "*"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.0",
+    "jest": "^21.2.1",
+    "prop-types": "^15.6.0",
+    "react": "^16.0.0",
+    "rollup": "^0.50.0",
+    "rollup-plugin-babel": "^3.0.2"
+  }
+}
