@@ -26,7 +26,10 @@ export class Mutate extends React.Component {
     }).isRequired
   };
 
-  state = {};
+  state = {
+    data: {},
+    loading: false
+  };
 
   componentDidMount() {
     this.mounted = true;
@@ -46,15 +49,17 @@ export class Mutate extends React.Component {
       variables
     });
 
+    this.setState({ loading: true });
+
     req
       .then(res => {
         if (this.mounted) {
-          this.setState(res);
+          this.setState({ ...res, loading: false });
         }
       })
       .catch(error => {
         if (this.mounted) {
-          this.setState({ error });
+          this.setState({ error, loading: false });
         }
       });
 
