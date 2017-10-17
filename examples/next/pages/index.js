@@ -27,21 +27,42 @@ export default ({ url: { query } }) => (
 const List = ({}) => (
   <div>
     <Query gql={ListOrderQuery}>
-      {({ data, error, loading, refetch }) =>
+      {({ data: { allOrders }, error, loading, refetch, fetchMore }) =>
         loading ? (
           Array.from({ length: 5 }).map((_, i) => <LoadingOrderRow key={i} />)
         ) : error ? (
           <span>{error}</span>
         ) : (
-          data.allOrders.map((order, i) => <OrderRow key={i} {...order} />)
+          [
+            allOrders.map((order, i) => <OrderRow key={i} {...order} />),
+            <button key="btn" type="button" onClick={() => refetch()}>
+              Refetch
+            </button>,
+            <button
+              key="btn2"
+              type="button"
+              onClick={() =>
+                fetchMore({
+                  variables: { after: allOrders[allOrders.length - 1].id },
+                  updateQuery: (previousResult, { fetchMoreResult }) => ({
+                    allOrders: [
+                      ...previousResult.allOrders,
+                      ...fetchMoreResult.allOrders
+                    ]
+                  })
+                })}
+            >
+              More
+            </button>
+          ]
         )}
     </Query>
   </div>
 );
 
 const ListOrderQuery = gql`
-  query ListOrder {
-    allOrders {
+  query ListOrder ($after: String) {
+    allOrders(first: 2, after: $after) {
       ...OrderRow
     }
   }
@@ -51,8 +72,12 @@ const ListOrderQuery = gql`
 const Show = ({ id }) => (
   <div>
     <Query gql={ShowOrderQuery} variables={{ id }} wait>
-      {({ data, error, refetch }) =>
-        error ? <span>{error}</span> : <SingleOrder {...data.Order} />}
+      {({ data: { Order }, error, refetch }) =>
+        error || !Order ? (
+          <span>{error || "Not Found"}</span>
+        ) : (
+          <SingleOrder {...Order} />
+        )}
     </Query>
   </div>
 );

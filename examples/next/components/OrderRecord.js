@@ -6,6 +6,7 @@ export const OrderRecordRow = ({ title }) => <li>{title}</li>;
 OrderRecordRow.fragments = {
   OrderRecordRow: gql`
     fragment OrderRecordRow on OrderRecord {
+      id
       title
     }
   `
