@@ -57,15 +57,24 @@ const List = ({}) => (
               More
             </button>,
 
-            <Mutate gql={AddOrderMutation} refetchQueries={["ListOrder"]}>
-              {add => (
+            <Mutate
+              key="add"
+              gql={AddOrderMutation}
+              refetchQueries={["ListOrder"]}
+            >
+              {(add, { data: { createOrder }, error, loading }) => (
                 <form
                   onSubmit={e => {
                     e.preventDefault();
-                    add({ name: e.target.elements.name.value });
+                    add({ name: e.currentTarget.elements.name.value });
                   }}
                 >
                   <input type="text" name="name" />
+                  <button disabled={loading}>
+                    {loading ? "Saving..." : "Save"}
+                  </button>
+
+                  {createOrder ? `created ${createOrder.id}` : null}
                 </form>
               )}
             </Mutate>
