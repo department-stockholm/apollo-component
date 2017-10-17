@@ -17,8 +17,8 @@ export class MockClient {
   mutate = async options => {};
 
   watchQuery = options => ({
-    refetch: () => {},
-    fetchMore: () => {},
+    refetch: async () => {},
+    fetchMore: async () => {},
     subscribe: ({ next, error }) => ({
       unsubscribe: () => {}
     })
