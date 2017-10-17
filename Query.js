@@ -20,6 +20,7 @@ export class Query extends React.Component {
   };
 
   state = {
+    data: {}, // allows easier destructuring like ({data: {blah}})
     loading: true
   };
 
@@ -73,20 +74,36 @@ export class Query extends React.Component {
 
   onNext = results => {
     if (this.mounted) {
-      console.error("next", results);
       this.setState(results);
     }
   };
 
   onError = error => {
     if (this.mounted) {
-      console.error("error", error);
-      this.setState({ error });
+      this.setState({ loading: false, error });
     }
   };
 
-  refetch = vars => this.observable && this.observable.refetch(vars);
-  fetchMore = opts => this.observable && this.observable.fetchMore(opts);
+  refetch = async vars => {
+    if (this.observable) {
+      this.setState({ loading: true });
+      try {
+        await this.observable.refetch(vars);
+      } finally {
+        this.setState({ loading: false });
+      }
+    }
+  };
+  fetchMore = async opts => {
+    if (this.observable) {
+      this.setState({ loading: true });
+      try {
+        await this.observable.fetchMore(opts);
+      } finally {
+        this.setState({ loading: false });
+      }
+    }
+  };
 
   render() {
     // FIXME <Query wait> will not render while loading the first time
