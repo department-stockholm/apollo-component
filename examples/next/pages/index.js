@@ -3,23 +3,25 @@ import "isomorphic-fetch";
 
 import React from "react";
 import gql from "graphql-tag";
-import { Provider, Query } from "apollo-component";
+import { Provider, Query, Mutate, MockClient } from "apollo-component";
 import ApolloClient, { HttpLink } from "apollo-client-preset";
 import { InMemoryCache } from "apollo-cache-inmemory";
 
-const getClient = () =>
-  new ApolloClient({
-    cache: new InMemoryCache(),
-    link: new HttpLink({
-      uri: "https://api.graph.cool/simple/v1/ciy1yx99701ou0147zvkyb6w5"
-    })
-  });
+const getClient = mock =>
+  mock
+    ? new MockClient([])
+    : new ApolloClient({
+        cache: new InMemoryCache(),
+        link: new HttpLink({
+          uri: "https://api.graph.cool/simple/v1/ciy1yx99701ou0147zvkyb6w5"
+        })
+      });
 
 import { OrderRow, LoadingOrderRow } from "../components/OrderRow";
 import { SingleOrder } from "../components/SingleOrder";
 
 export default ({ url: { query } }) => (
-  <Provider client={getClient()}>
+  <Provider client={getClient(query.mock)}>
     {query.id ? <Show id={query.id} /> : <List />}
   </Provider>
 );
@@ -53,16 +55,37 @@ const List = ({}) => (
                 })}
             >
               More
-            </button>
+            </button>,
+
+            <Mutate gql={AddOrderMutation} refetchQueries={["ListOrder"]}>
+              {add => (
+                <form
+                  onSubmit={e => {
+                    e.preventDefault();
+                    add({ name: e.target.elements.name.value });
+                  }}
+                >
+                  <input type="text" name="name" />
+                </form>
+              )}
+            </Mutate>
           ]
         )}
     </Query>
   </div>
 );
 
+const AddOrderMutation = gql`
+  mutation AddOrder($name: String!) {
+    createOrder(name: $name) {
+      id
+    }
+  }
+`;
+
 const ListOrderQuery = gql`
   query ListOrder ($after: String) {
-    allOrders(first: 2, after: $after) {
+    allOrders(first: 2, after: $after, orderBy: name_ASC) {
       ...OrderRow
     }
   }
