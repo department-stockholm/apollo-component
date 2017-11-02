@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "apollo-component": "latest",
+    "@department/apollo-component": "../..",
     "react": "latest",
     "react-dom": "latest"
   },

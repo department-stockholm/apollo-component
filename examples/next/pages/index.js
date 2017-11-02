@@ -3,15 +3,18 @@ import "isomorphic-fetch";
 
 import React from "react";
 import gql from "graphql-tag";
-import { Provider, Query, Mutate, MockClient } from "apollo-component";
+import {
+  Provider,
+  Query,
+  Mutate,
+  MockClient
+} from "@department/apollo-component";
 import ApolloClient, { HttpLink } from "apollo-client-preset";
-import { InMemoryCache } from "apollo-cache-inmemory";
 
 const getClient = mock =>
   mock
     ? new MockClient([])
     : new ApolloClient({
-        cache: new InMemoryCache(),
         link: new HttpLink({
           uri: "https://api.graph.cool/simple/v1/ciy1yx99701ou0147zvkyb6w5"
         })

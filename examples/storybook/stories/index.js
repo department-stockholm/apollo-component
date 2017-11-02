@@ -1,6 +1,6 @@
 import React from "react";
 import gql from "graphql-tag";
-import { Provider, MockClient, Query } from "apollo-component";
+import { Provider, MockClient, Query } from "@department/apollo-component";
 
 import { storiesOf } from "@storybook/react";
 import { action } from "@storybook/addon-actions";
