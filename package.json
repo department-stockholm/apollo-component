@@ -1,5 +1,5 @@
 {
-  "name": "apollo-component",
+  "name": "@department/apollo-component",
   "version": "0.1.0",
   "description": "",
   "main": "dist/index.cjs.js",
