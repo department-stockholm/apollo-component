@@ -1,10 +1,16 @@
 import babel from "rollup-plugin-babel";
+import { list as babelHelpersList } from "babel-helpers";
 
 const plugins = () => [
   babel({
     babelrc: false,
     exclude: "node_modules/**",
-    externalHelpers: true,
+
+    // fixing temporary rollup's regression, remove when rollup/rollup#1595 gets solved
+    externalHelpersWhitelist: babelHelpersList.filter(
+      helperName => helperName !== "asyncGenerator"
+    ),
+
     plugins: [
       "babel-plugin-transform-object-rest-spread",
       "babel-plugin-transform-class-properties",
