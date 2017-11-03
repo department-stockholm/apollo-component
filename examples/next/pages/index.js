@@ -1,5 +1,5 @@
 import "babel-polyfill";
-import "isomorphic-fetch";
+import fetch from "isomorphic-fetch";
 
 import React from "react";
 import gql from "graphql-tag";
@@ -17,7 +17,8 @@ const getClient = mock =>
     : new ApolloClient({
         link: new HttpLink({
           uri: "https://api.graph.cool/simple/v1/ciy1yx99701ou0147zvkyb6w5"
-        })
+        }),
+        fetch
       });
 
 import { OrderRow, LoadingOrderRow } from "../components/OrderRow";

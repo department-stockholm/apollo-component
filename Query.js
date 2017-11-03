@@ -53,7 +53,7 @@ export class Query extends React.Component {
     }
   }
 
-  request = async () => {
+  request = () => {
     const { gql, variables } = this.props;
     // TODO more options
     const options = {
@@ -84,24 +84,19 @@ export class Query extends React.Component {
     }
   };
 
-  refetch = async vars => {
+  refetch = vars => {
     if (this.observable) {
+      const done = () => this.setState({ loading: false });
       this.setState({ loading: true });
-      try {
-        await this.observable.refetch(vars);
-      } finally {
-        this.setState({ loading: false });
-      }
+      return this.observable.refetch(opts).then(done, done);
     }
   };
-  fetchMore = async opts => {
+
+  fetchMore = opts => {
     if (this.observable) {
+      const done = () => this.setState({ loading: false });
       this.setState({ loading: true });
-      try {
-        await this.observable.fetchMore(opts);
-      } finally {
-        this.setState({ loading: false });
-      }
+      return this.observable.fetchMore(opts).then(done, done);
     }
   };
 

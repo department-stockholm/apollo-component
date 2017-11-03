@@ -4,6 +4,7 @@ const plugins = () => [
   babel({
     babelrc: false,
     exclude: "node_modules/**",
+    externalHelpers: true,
     plugins: [
       "babel-plugin-transform-object-rest-spread",
       "babel-plugin-transform-class-properties",
