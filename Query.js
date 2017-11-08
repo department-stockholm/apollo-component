@@ -28,7 +28,7 @@ export class Query extends React.Component {
     // TODO figure out SSR? can we just queue up queries in
     //      the provider? or traverse the tree like in react-apollo?
     this.mounted = true;
-    this.request();
+    this.request(this.props);
   }
 
   componentWillUnmount() {
@@ -46,15 +46,14 @@ export class Query extends React.Component {
 
   componentWillReceiveProps(nextProps, nextContext) {
     if (nextProps.gql !== this.props.gql) {
-      return this.request();
+      return this.request(nextProps);
     }
     if (!shallowEquals(this.props.variables, nextProps.variables)) {
-      return this.request();
+      return this.request(nextProps);
     }
   }
 
-  request = () => {
-    const { gql, variables } = this.props;
+  request = ({ gql, variables }) => {
     // TODO more options
     const options = {
       query: gql,
