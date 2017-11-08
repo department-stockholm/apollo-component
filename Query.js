@@ -19,14 +19,17 @@ export class Query extends React.Component {
     }).isRequired
   };
 
-  state = {
-    data: {}, // allows easier destructuring like ({data: {blah}})
-    loading: true
-  };
+  componentWillMount() {
+    const { client } = this.context.apollo;
+
+    this.observable = client.watchQuery(propsToOptions(this.props));
+
+    if (!this.props.lazy && client.ssrQueries) {
+      client.ssrQueries.push(this.observable);
+    }
+  }
 
   componentDidMount() {
-    // TODO figure out SSR? can we just queue up queries in
-    //      the provider? or traverse the tree like in react-apollo?
     this.mounted = true;
     this.request(this.props);
   }
@@ -53,66 +56,76 @@ export class Query extends React.Component {
     }
   }
 
-  request = ({ gql, variables }) => {
-    // TODO more options
-    const options = {
-      query: gql,
-      variables
-    };
+  request = props => {
+    this.observable.setOptions(propsToOptions(props));
 
-    if (this.observable) {
-      this.observable.setOptions(options);
-    } else {
-      this.observable = this.context.apollo.client.watchQuery(options);
+    if (!this.subscription) {
+      const update = () => {
+        if (this.mounted) {
+          this.forceUpdate();
+        }
+      };
       this.subscription = this.observable.subscribe({
-        next: this.onNext,
-        error: this.onError
+        next: update,
+        error: update
       });
     }
   };
 
-  onNext = results => {
-    if (this.mounted) {
-      this.setState(results);
+  getState = () => {
+    const currentResult = this.observable.currentResult();
+    const { loading, error } = currentResult;
+    const data = {};
+    // Let's do what we can to give the user data
+    if (loading) {
+      Object.assign(data, this.previousData, currentResult.data);
+    } else if (error) {
+      Object.assign(data, (this.observable.getLastResult() || {}).data);
+    } else {
+      this.previousData = currentResult.data;
+      Object.assign(data, currentResult.data);
     }
-  };
-
-  onError = error => {
-    if (this.mounted) {
-      this.setState({ loading: false, error });
-    }
+    return {
+      loading,
+      error,
+      data
+    };
   };
 
   refetch = vars => {
     if (this.observable) {
-      return this.withLoading(this.observable.refetch(vars));
+      return this.observable.refetch(vars);
     }
   };
 
   fetchMore = opts => {
     if (this.observable) {
-      return this.withLoading(this.observable.fetchMore(opts));
+      return this.observable.fetchMore(opts);
     }
-  };
-
-  withLoading = promise => {
-    const done = () => this.setState({ loading: false });
-    this.setState({ loading: true });
-    return promise.then(done, done);
   };
 
   render() {
+    const state = this.getState();
+
     // FIXME <Query wait> will not render while loading the first time
-    if (this.props.wait && this.state.loading) {
+    if (this.props.wait && state.loading) {
       return null;
     }
+
     return this.props.children({
-      ...this.state,
+      ...state,
       refetch: this.refetch,
       fetchMore: this.fetchMore
     });
   }
 }
+
+const propsToOptions = ({ gql, variables }) =>
+  // TODO more options
+  ({
+    query: gql,
+    variables
+  });
 
 function shallowEquals(a, b) {
   for (let key in a) if (a[key] !== b[key]) return false;

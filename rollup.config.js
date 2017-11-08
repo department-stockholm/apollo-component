@@ -7,8 +7,8 @@ const plugins = () => [
 
     plugins: [
       "babel-plugin-transform-object-rest-spread",
-      "babel-plugin-transform-class-properties",
-      "babel-plugin-external-helpers"
+      "babel-plugin-transform-class-properties"
+      // "babel-plugin-external-helpers"
     ],
     presets: [
       [
