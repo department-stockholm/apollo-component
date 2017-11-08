@@ -86,18 +86,20 @@ export class Query extends React.Component {
 
   refetch = vars => {
     if (this.observable) {
-      const done = () => this.setState({ loading: false });
-      this.setState({ loading: true });
-      return this.observable.refetch(opts).then(done, done);
+      return this.withLoading(this.observable.refetch(vars));
     }
   };
 
   fetchMore = opts => {
     if (this.observable) {
-      const done = () => this.setState({ loading: false });
-      this.setState({ loading: true });
-      return this.observable.fetchMore(opts).then(done, done);
+      return this.withLoading(this.observable.fetchMore(opts));
     }
+  };
+
+  withLoading = promise => {
+    const done = () => this.setState({ loading: false });
+    this.setState({ loading: true });
+    return promise.then(done, done);
   };
 
   render() {
