@@ -4,17 +4,19 @@ const plugins = () => [
   babel({
     babelrc: false,
     exclude: "node_modules/**",
-
     plugins: [
       "babel-plugin-transform-object-rest-spread",
       "babel-plugin-transform-class-properties"
-      // "babel-plugin-external-helpers"
     ],
     presets: [
       [
         "env",
         {
-          modules: false
+          loose: true,
+          modules: false,
+          targets: {
+            browsers: ["last 2 versions", "IE >= 9"]
+          }
         }
       ]
     ]
@@ -28,7 +30,7 @@ export default [
       format: "es",
       file: "dist/index.esm.mjs"
     },
-    external: ["react", "prop-types"],
+    external: ["react", "react-dom/server", "prop-types"],
     plugins: plugins()
   },
   {
@@ -38,7 +40,7 @@ export default [
       file: "dist/index.cjs.js",
       exports: "named"
     },
-    external: ["react", "prop-types"],
+    external: ["react", "react-dom/server", "prop-types"],
     plugins: plugins()
   }
 ];
