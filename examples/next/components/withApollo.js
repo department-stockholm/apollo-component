@@ -1,5 +1,7 @@
+import { Router } from "next/router";
 import fetch from "isomorphic-unfetch";
 import React from "react";
+import PropTypes from "prop-types";
 import { Provider, renderState } from "@department/apollo-component";
 import ApolloClient, { ApolloLink, HttpLink } from "apollo-client-preset";
 
@@ -14,7 +16,16 @@ export default Component =>
       // and render the state of the root component
       // to populate the cache
       const client = createClient({ ssrMode: !!ctx.req });
-      await renderState(client, <Component query={ctx.query} />);
+
+      // wrapping the component with a RouterContext to
+      // make the next/router.withRouter HoC work
+      const router = new Router(ctx.pathname, ctx.query, ctx.asPath);
+      await renderState(
+        client,
+        <RouterContext router={router}>
+          <Component query={ctx.query} />
+        </RouterContext>
+      );
 
       let props = {};
       if (Component.getInitialProps) {
@@ -36,6 +47,24 @@ export default Component =>
       );
     }
   };
+
+// RouterContext emulates the App component used in next in that it
+// adds a router object to the context
+class RouterContext extends React.Component {
+  static childContextTypes = {
+    router: PropTypes.object
+  };
+
+  getChildContext() {
+    return {
+      router: this.props.router
+    };
+  }
+
+  render() {
+    return this.props.children;
+  }
+}
 
 const createClient = (opts = {}, state) => {
   const client = new ApolloClient({

@@ -1,4 +1,5 @@
 import React from "react";
+import { withRouter } from "next/router";
 import gql from "graphql-tag";
 import { Query, Mutate } from "@department/apollo-component";
 
@@ -6,7 +7,7 @@ import withApollo from "../components/withApollo";
 import { OrderRow, LoadingOrderRow } from "../components/OrderRow";
 import { SingleOrder } from "../components/SingleOrder";
 
-const Root = ({ query }) => (query.id ? <Show id={query.id} /> : <List />);
+const Root = ({ query }) => (query.id ? <Show /> : <List />);
 
 const List = ({}) => (
   <div>
@@ -83,9 +84,9 @@ const ListOrderQuery = gql`
   ${OrderRow.fragments.OrderRow}
 `;
 
-const Show = ({ id }) => (
+const Show = withRouter(({ router: { query } }) => (
   <div>
-    <Query gql={ShowOrderQuery} variables={{ id }} wait>
+    <Query gql={ShowOrderQuery} variables={query} wait>
       {({ data: { Order }, error, refetch }) =>
         error || !Order ? (
           <span>{error || "Not Found"}</span>
@@ -94,7 +95,7 @@ const Show = ({ id }) => (
         )}
     </Query>
   </div>
-);
+));
 
 const ShowOrderQuery = gql`
   query ShowOrder($id: ID!) {
