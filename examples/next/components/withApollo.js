@@ -1,7 +1,7 @@
 import fetch from "isomorphic-unfetch";
 import React from "react";
 import { Provider, renderState } from "@department/apollo-component";
-import ApolloClient, { HttpLink } from "apollo-client-preset";
+import ApolloClient, { ApolloLink, HttpLink } from "apollo-client-preset";
 
 export default Component =>
   class extends React.Component {
@@ -39,14 +39,28 @@ export default Component =>
 
 const createClient = (opts = {}, state) => {
   const client = new ApolloClient({
-    link: new HttpLink({
-      fetch,
-      uri: "https://api.graph.cool/simple/v1/ciy1yx99701ou0147zvkyb6w5"
-    }),
+    link: ApolloLink.from([auth(opts), http(opts)]),
     ...opts
   });
+
   if (state) {
     client.cache.restore(state);
   }
   return client;
 };
+
+const http = () =>
+  new HttpLink({
+    fetch,
+    uri: "https://api.graph.cool/simple/v1/ciy1yx99701ou0147zvkyb6w5"
+  });
+
+const auth = ({ token }) =>
+  new ApolloLink((operation, forward) => {
+    operation.setContext({
+      headers: {
+        authorization: token || null
+      }
+    });
+    return forward(operation);
+  });
