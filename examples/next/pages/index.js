@@ -11,14 +11,11 @@ import { SingleOrder } from "../components/SingleOrder";
 
 export default class extends React.Component {
   static async getInitialProps({ req, query }) {
-    const ssrMode = !!req;
-
     // create a client in ssr mode
     // and render the state of the root component
     // to populate the cache
-    const client = createClient({ ssrMode });
-    await renderState(client, <Root client={client} id={query.id} />);
-
+    const client = createClient({ ssrMode: !!req });
+    await renderState(client, <Root id={query.id} />);
     return { state: client.cache.extract() };
   }
 
@@ -28,7 +25,11 @@ export default class extends React.Component {
 
   render() {
     const { url: { query } } = this.props;
-    return <Root client={this.client} id={query.id} />;
+    return (
+      <Provider client={this.client}>
+        <Root id={query.id} />
+      </Provider>
+    );
   }
 }
 
@@ -51,10 +52,14 @@ const renderState = async (client, component, { depth = Infinity } = {}) => {
     return;
   }
   for (let d = 0; d < depth; d++) {
-    client.ssrQueries = [];
-    renderToStaticMarkup(component);
+    const queries = [];
+    renderToStaticMarkup(
+      <Provider client={client} queries={queries}>
+        {component}
+      </Provider>
+    );
 
-    const queue = client.ssrQueries
+    const queue = queries
       .filter(q => q.currentResult().loading)
       .map(q => q.result());
 
@@ -66,9 +71,7 @@ const renderState = async (client, component, { depth = Infinity } = {}) => {
   }
 };
 
-const Root = ({ client, id }) => (
-  <Provider client={client}>{id ? <Show id={id} /> : <List />}</Provider>
-);
+const Root = ({ id }) => (id ? <Show id={id} /> : <List />);
 
 const List = ({}) => (
   <div>

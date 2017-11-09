@@ -15,17 +15,18 @@ import PropTypes from "prop-types";
 export class Query extends React.Component {
   static contextTypes = {
     apollo: PropTypes.shape({
-      client: PropTypes.object.isRequired
+      client: PropTypes.object.isRequired,
+      queries: PropTypes.array
     }).isRequired
   };
 
   componentWillMount() {
-    const { client } = this.context.apollo;
+    const { client, queries } = this.context.apollo;
 
     this.observable = client.watchQuery(propsToOptions(this.props));
 
-    if (!this.props.lazy && client.ssrQueries) {
-      client.ssrQueries.push(this.observable);
+    if (!this.props.lazy && queries) {
+      queries.push(this.observable);
     }
   }
 
