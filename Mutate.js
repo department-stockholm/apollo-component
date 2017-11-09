@@ -54,7 +54,7 @@ export class Mutate extends React.Component {
     req
       .then(res => {
         if (this.mounted) {
-          this.setState({ ...res, loading: false });
+          this.setState({ ...res, error: null, loading: false });
         }
       })
       .catch(error => {
