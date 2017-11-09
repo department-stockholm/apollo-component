@@ -1,9 +1,13 @@
 import fetch from "isomorphic-unfetch";
 
 import React from "react";
-import { renderToStaticMarkup } from "react-dom/server";
 import gql from "graphql-tag";
-import { Provider, Query, Mutate } from "@department/apollo-component";
+import {
+  Provider,
+  Query,
+  Mutate,
+  renderState
+} from "@department/apollo-component";
 import ApolloClient, { HttpLink } from "apollo-client-preset";
 
 import { OrderRow, LoadingOrderRow } from "../components/OrderRow";
@@ -45,30 +49,6 @@ const createClient = (opts = {}, state) => {
     client.cache.restore(state);
   }
   return client;
-};
-
-const renderState = async (client, component, { depth = Infinity } = {}) => {
-  if (!client.ssrMode) {
-    return;
-  }
-  for (let d = 0; d < depth; d++) {
-    const queries = [];
-    renderToStaticMarkup(
-      <Provider client={client} queries={queries}>
-        {component}
-      </Provider>
-    );
-
-    const queue = queries
-      .filter(q => q.currentResult().loading)
-      .map(q => q.result());
-
-    if (queue.length) {
-      await Promise.all(queue);
-    } else {
-      break;
-    }
-  }
 };
 
 const Root = ({ id }) => (id ? <Show id={id} /> : <List />);
