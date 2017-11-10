@@ -1,17 +1,19 @@
 import { createElement } from "react";
+import { render } from "react-dom";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Provider } from "./Provider";
 
+function renderToDOM(component) {
+  const element = document.createElement("div");
+  render(component, element);
+}
+
 export const renderState = (client, component, { depth = Infinity } = {}) => {
-  if (!client.ssrMode) {
-    return Promise.resolve();
-  }
+  const renderer = client.ssrMode ? renderToStaticMarkup : renderToDOM;
 
   const render = () => {
     const queries = [];
-    renderToStaticMarkup(
-      createElement(Provider, { client, queries }, component)
-    );
+    renderer(createElement(Provider, { client, queries }, component));
 
     const queue = queries
       .filter(q => q.currentResult().loading)

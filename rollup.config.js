@@ -30,7 +30,7 @@ export default [
       format: "es",
       file: "dist/index.esm.mjs"
     },
-    external: ["react", "react-dom/server", "prop-types"],
+    external: ["react", "react-dom", "react-dom/server", "prop-types"],
     plugins: plugins()
   },
   {
@@ -40,7 +40,7 @@ export default [
       file: "dist/index.cjs.js",
       exports: "named"
     },
-    external: ["react", "react-dom/server", "prop-types"],
+    external: ["react", "react-dom", "react-dom/server", "prop-types"],
     plugins: plugins()
   }
 ];
