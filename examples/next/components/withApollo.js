@@ -19,7 +19,11 @@ export default Component =>
 
       // wrapping the component with a RouterContext to
       // make the next/router.withRouter HoC work
-      const router = new Router(ctx.pathname, ctx.query, ctx.asPath);
+      const router = {
+        pathname: ctx.pathname,
+        query: ctx.query,
+        asPath: ctx.asPath
+      };
       await renderState(
         client,
         <RouterContext router={router}>
