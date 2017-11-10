@@ -88,8 +88,10 @@ const Show = withRouter(({ router: { query } }) => (
   <div>
     <Query gql={ShowOrderQuery} variables={query} wait>
       {({ data: { Order }, error, refetch }) =>
-        error || !Order ? (
-          <span>{error || "Not Found"}</span>
+        error ? (
+          <span>{error}</span>
+        ) : !Order ? (
+          <span>{"Not Found"}</span>
         ) : (
           <SingleOrder {...Order} />
         )}
