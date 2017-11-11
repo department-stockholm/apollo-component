@@ -20,12 +20,14 @@ export const renderState = (client, component, { depth = Infinity } = {}) => {
       .map(q => q.result());
 
     if (queue.length) {
-      return Promise.all(queue).then(() => {
-        if (--depth > 0) {
-          return render();
-        }
-      });
+      return (
+        Promise.all(queue)
+          // try to go deeper if we succeed
+          .then(() => --depth && render())
+      );
     }
+
+    return Promise.resolve();
   };
 
   return render();

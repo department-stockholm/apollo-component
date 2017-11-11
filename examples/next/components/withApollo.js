@@ -24,12 +24,19 @@ export default Component =>
         query: ctx.query,
         asPath: ctx.asPath
       };
-      await renderState(
-        client,
-        <RouterContext router={router}>
-          <Component query={ctx.query} />
-        </RouterContext>
-      );
+
+      try {
+        await renderState(
+          client,
+          <RouterContext router={router}>
+            <Component query={ctx.query} />
+          </RouterContext>
+        );
+      } catch (err) {
+        // you can let the error throw here
+        // or ignore it and let the client side
+        // handle it inline
+      }
 
       let props = {};
       if (Component.getInitialProps) {
@@ -72,7 +79,7 @@ class RouterContext extends React.Component {
 
 const createClient = (opts = {}, state) => {
   const client = new ApolloClient({
-    link: ApolloLink.from([auth(opts), http(opts)]),
+    link: ApolloLink.from([logs(opts), auth(opts), http(opts)]),
     ...opts
   });
 
@@ -96,4 +103,17 @@ const auth = ({ token }) =>
       }
     });
     return forward(operation);
+  });
+
+const logs = ({}) =>
+  new ApolloLink((operation, forward) => {
+    const t = Date.now();
+    return forward(operation).map(response => {
+      console.log(
+        "request for %s took %sms",
+        operation.operationName,
+        Date.now() - t
+      );
+      return response;
+    });
   });

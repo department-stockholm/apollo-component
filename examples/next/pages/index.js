@@ -7,65 +7,110 @@ import withApollo from "../components/withApollo";
 import { OrderRow, LoadingOrderRow } from "../components/OrderRow";
 import { SingleOrder } from "../components/SingleOrder";
 
-const Root = ({ query }) => (query.id ? <Show /> : <List />);
+const Root = ({ query }) =>
+  query.error ? <Error /> : query.id ? <Show /> : <List />;
 
 const List = ({}) => (
-  <div>
-    <Query gql={ListOrderQuery}>
-      {({ data: { allOrders }, error, loading, refetch, fetchMore }) =>
-        loading ? (
-          Array.from({ length: 5 }).map((_, i) => <LoadingOrderRow key={i} />)
-        ) : error ? (
-          <span>{error}</span>
-        ) : (
-          [
-            allOrders.map((order, i) => <OrderRow key={i} {...order} />),
-            <button key="btn" type="button" onClick={() => refetch()}>
-              Refetch
-            </button>,
-            <button
-              key="btn2"
-              type="button"
-              onClick={() =>
-                fetchMore({
-                  variables: { after: allOrders[allOrders.length - 1].id },
-                  updateQuery: (previousResult, { fetchMoreResult }) => ({
-                    allOrders: [
-                      ...previousResult.allOrders,
-                      ...fetchMoreResult.allOrders
-                    ]
-                  })
-                })}
-            >
-              More
-            </button>,
+  <Query gql={ListOrderQuery}>
+    {({ data: { allOrders }, error, loading, refetch, fetchMore }) =>
+      loading ? (
+        Array.from({ length: 5 }).map((_, i) => <LoadingOrderRow key={i} />)
+      ) : error ? (
+        <span>{error}</span>
+      ) : (
+        [
+          allOrders.map((order, i) => <OrderRow key={i} {...order} />),
+          <button key="btn" type="button" onClick={refetch}>
+            Refetch
+          </button>,
+          <button
+            key="btn2"
+            type="button"
+            onClick={() =>
+              fetchMore({
+                variables: { after: allOrders[allOrders.length - 1].id },
+                updateQuery: (previousResult, { fetchMoreResult }) => ({
+                  allOrders: [
+                    ...previousResult.allOrders,
+                    ...fetchMoreResult.allOrders
+                  ]
+                })
+              })}
+          >
+            More
+          </button>,
+          <Posts key="posts" />,
+          <Mutate
+            key="add"
+            gql={AddOrderMutation}
+            refetchQueries={["ListOrder"]}
+          >
+            {(add, { data: { createOrder }, error, loading }) => (
+              <form
+                onSubmit={e => {
+                  e.preventDefault();
+                  add({ name: e.currentTarget.elements.name.value });
+                }}
+              >
+                <input type="text" name="name" />
+                <button disabled={loading}>
+                  {loading ? "Saving..." : "Save"}
+                </button>
 
-            <Mutate
-              key="add"
-              gql={AddOrderMutation}
-              refetchQueries={["ListOrder"]}
-            >
-              {(add, { data: { createOrder }, error, loading }) => (
-                <form
-                  onSubmit={e => {
-                    e.preventDefault();
-                    add({ name: e.currentTarget.elements.name.value });
-                  }}
-                >
-                  <input type="text" name="name" />
-                  <button disabled={loading}>
-                    {loading ? "Saving..." : "Save"}
-                  </button>
-
-                  {createOrder ? `created ${createOrder.id}` : null}
-                </form>
-              )}
-            </Mutate>
-          ]
-        )}
-    </Query>
-  </div>
+                {createOrder ? `created ${createOrder.id}` : null}
+              </form>
+            )}
+          </Mutate>
+        ]
+      )}
+  </Query>
 );
+
+const Posts = withRouter(({ router: { query } }) => (
+  <Query gql={ListPostsQuery} lazy={query.lazy}>
+    {({ loading, data: { allPosts }, error }) =>
+      loading ? (
+        <span>Loading posts</span>
+      ) : error ? (
+        <span>Error while loading posts: {error.message}</span>
+      ) : (
+        allPosts.map(p => <span key={p.id}>{p.id}</span>)
+      )}
+  </Query>
+));
+
+const Error = withRouter(({ router: { query } }) => (
+  <Query gql={ListInvalidPostsQuery} fail={query.fail}>
+    {({ loading, data: { allPosts }, error }) =>
+      loading ? (
+        <span>Loading posts</span>
+      ) : error ? (
+        <span>Error while loading posts: {error.message}</span>
+      ) : (
+        allPosts.map(p => <span key={p.id}>{p.id}</span>)
+      )}
+  </Query>
+));
+
+const ListPostsQuery = gql`
+  query ListPosts {
+    allPosts {
+      id
+      description
+      sections
+    }
+  }
+`;
+
+const ListInvalidPostsQuery = gql`
+  query ListInvalidPosts {
+    allPosts {
+      idz
+      description
+      sections
+    }
+  }
+`;
 
 const AddOrderMutation = gql`
   mutation AddOrder($name: String!) {
@@ -85,18 +130,16 @@ const ListOrderQuery = gql`
 `;
 
 const Show = withRouter(({ router: { query } }) => (
-  <div>
-    <Query gql={ShowOrderQuery} variables={query} wait>
-      {({ data: { Order }, error, refetch }) =>
-        error ? (
-          <span>{error}</span>
-        ) : !Order ? (
-          <span>{"Not Found"}</span>
-        ) : (
-          <SingleOrder {...Order} />
-        )}
-    </Query>
-  </div>
+  <Query gql={ShowOrderQuery} variables={query} wait>
+    {({ data: { Order }, error, refetch }) =>
+      error ? (
+        <span>{error.message}</span>
+      ) : !Order ? (
+        <span>{"Not Found"}</span>
+      ) : (
+        <SingleOrder {...Order} />
+      )}
+  </Query>
 ));
 
 const ShowOrderQuery = gql`
