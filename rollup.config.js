@@ -29,6 +29,7 @@ export default [
       globals: {
         react: "React",
         "react-dom": "ReactDOM",
+        "react-dom/server": "ReactDOM",
         "prop-types": "PropTypes"
       }
     },
