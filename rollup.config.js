@@ -1,27 +1,4 @@
-import babel from "rollup-plugin-babel";
-
-const plugins = () => [
-  babel({
-    babelrc: false,
-    exclude: "node_modules/**",
-    plugins: [
-      "babel-plugin-transform-object-rest-spread",
-      "babel-plugin-transform-class-properties"
-    ],
-    presets: [
-      [
-        "env",
-        {
-          loose: true,
-          modules: false,
-          targets: {
-            browsers: ["last 2 versions", "IE >= 9"]
-          }
-        }
-      ]
-    ]
-  })
-];
+import buble from "rollup-plugin-buble";
 
 export default [
   {
@@ -31,7 +8,7 @@ export default [
       file: "dist/index.esm.mjs"
     },
     external: ["react", "react-dom", "react-dom/server", "prop-types"],
-    plugins: plugins()
+    plugins: [buble()]
   },
   {
     input: "index.js",
@@ -41,6 +18,21 @@ export default [
       exports: "named"
     },
     external: ["react", "react-dom", "react-dom/server", "prop-types"],
-    plugins: plugins()
+    plugins: [buble()]
+  },
+  {
+    input: "index.js",
+    output: {
+      format: "umd",
+      name: "ApolloComponent",
+      file: "dist/browser.js",
+      globals: {
+        react: "React",
+        "react-dom": "ReactDOM",
+        "prop-types": "PropTypes"
+      }
+    },
+    external: ["react", "react-dom", "react-dom/server", "prop-types"],
+    plugins: [buble()]
   }
 ];
