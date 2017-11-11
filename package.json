@@ -1,7 +1,7 @@
 {
   "name": "@department/apollo-component",
   "version": "1.2.1-2",
-  "description": "",
+  "description": "Render component for your Apollo Client",
   "main": "dist/index.cjs.js",
   "jsnext:main": "dist/index.esm.mjs",
   "module": "dist/index.esm.mjs",
