@@ -20,16 +20,14 @@ import PropTypes from "prop-types";
  * }</Mutate>
  */
 export class Mutate extends React.Component {
-  static contextTypes = {
-    apollo: PropTypes.shape({
-      client: PropTypes.object.isRequired
-    }).isRequired
-  };
-
-  state = {
-    data: {},
-    loading: false
-  };
+  constructor() {
+    super();
+    this.mutate = this.mutate.bind(this);
+    this.state = {
+      data: {},
+      loading: false
+    };
+  }
 
   componentDidMount() {
     this.mounted = true;
@@ -39,9 +37,10 @@ export class Mutate extends React.Component {
     this.mounted = false;
   }
 
-  mutate = variables => {
+  mutate(variables) {
+    const { client } = this.context.apollo;
     const { gql, refetchQueries, optimisticResponse, update } = this.props;
-    const req = this.context.apollo.client.mutate({
+    const req = client.mutate({
       mutation: gql,
       refetchQueries,
       optimisticResponse,
@@ -54,7 +53,9 @@ export class Mutate extends React.Component {
     req
       .then(res => {
         if (this.mounted) {
-          this.setState({ ...res, error: null, loading: false });
+          this.setState(
+            Object.assign({}, res, { error: null, loading: false })
+          );
         }
       })
       .catch(error => {
@@ -64,9 +65,15 @@ export class Mutate extends React.Component {
       });
 
     return req;
-  };
+  }
 
   render() {
-    return this.props.children(this.mutate, this.state);
+    return (this.props.render || this.props.children)(this.mutate, this.state);
   }
 }
+
+Mutate.contextTypes = {
+  apollo: PropTypes.shape({
+    client: PropTypes.object.isRequired
+  }).isRequired
+};

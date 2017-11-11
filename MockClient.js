@@ -14,13 +14,17 @@ export class MockClient {
     this.mocks = mocks;
   }
 
-  mutate = options => new Promise(resolve => resolve());
+  mutate(options) {
+    return new Promise(resolve => resolve());
+  }
 
-  watchQuery = options => ({
-    refetch: options => new Promise(resolve => resolve()),
-    fetchMore: options => new Promise(resolve => resolve()),
-    subscribe: ({ next, error }) => ({
-      unsubscribe: () => {}
-    })
-  });
+  watchQuery(options) {
+    return {
+      refetch: options => new Promise(resolve => resolve()),
+      fetchMore: options => new Promise(resolve => resolve()),
+      subscribe: ({ next, error }) => ({
+        unsubscribe: () => {}
+      })
+    };
+  }
 }
