@@ -20,7 +20,12 @@ export class Query extends React.Component {
   }
 
   componentWillMount() {
-    const { client, queries } = this.context.apollo;
+    const { client, queries } = this.context.apollo || {};
+    if (!client) {
+      throw new Error(
+        "missing apollo client in context. is there a <Provider /> ancestor component?"
+      );
+    }
 
     this.observable = client.watchQuery(propsToOptions(this.props));
 
