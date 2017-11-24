@@ -74,36 +74,36 @@ const IncrementView = ({ id }) => (
 
 Available Props:
 
-* gql
-* wait
-* lazy
-* fail
-* variables
+* `gql`
+* `wait`
+* `lazy`
+* `fail`
+* `variables`
 
 Arguments in render callback:
 
 * QueryResults
-  * data
-  * loading
-  * error
-  * refetch
-  * fetchMore
+  * `data`
+  * `loading`
+  * `error`
+  * `refetch`
+  * `fetchMore`
 
 ### <Mutate />
 
 Available Props:
 
-* gql
-* refetchQueries
-* optimisticResponse
-* update
+* `gql`
+* `refetchQueries`
+* `optimisticResponse`
+* `update`
 
 Arguments in render callback:
 
 * Mutate(variables)
 * QueryResults
-  * data
-  * loading
-  * error
-  * refetch
-  * fetchMore
+  * `data`
+  * `loading`
+  * `error`
+  * `refetch`
+  * `fetchMore`

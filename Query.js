@@ -179,7 +179,11 @@ Query.propTypes = {
 
   // Context to pass to ApolloLink
   // see https://www.apollographql.com/docs/react/basics/queries.html#graphql-config-options-context
-  context: PropTypes.object
+  context: PropTypes.object,
+
+  // Render using either the `children`- or a `render`-prop callback
+  children: PropTypes.func,
+  render: PropTypes.func
 };
 
 const propsToOptions = ({

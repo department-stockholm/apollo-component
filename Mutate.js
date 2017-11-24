@@ -68,6 +68,11 @@ export class Mutate extends React.Component {
   }
 
   render() {
+    // <Mutate fail> will throw the error instead of using the callback
+    if (this.props.fail && state.error) {
+      throw state.error;
+    }
+
     return (this.props.render || this.props.children)(this.mutate, this.state);
   }
 }
@@ -76,4 +81,26 @@ Mutate.contextTypes = {
   apollo: PropTypes.shape({
     client: PropTypes.object.isRequired
   }).isRequired
+};
+
+Mutate.propTypes = {
+  // A graphql-tag compiled gql query
+  gql: PropTypes.object.isRequired,
+
+  // Fail by throwing an exception and letting the React error boundary
+  // take care of it instead of passing the error into the render callback
+  fail: PropTypes.bool,
+
+  // see https://www.apollographql.com/docs/react/basics/mutations.html#graphql-mutation-options-refetchQueries
+  refetchQueries: PropTypes.array,
+
+  // see https://www.apollographql.com/docs/react/basics/mutations.html#graphql-mutation-options-optimisticResponse
+  optimisticResponse: PropTypes.func,
+
+  // see https://www.apollographql.com/docs/react/basics/mutations.html#graphql-mutation-options-update
+  update: PropTypes.func,
+
+  // Render using either the `children`- or a `render`-prop callback
+  children: PropTypes.func,
+  render: PropTypes.func
 };
