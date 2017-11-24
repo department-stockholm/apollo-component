@@ -28,6 +28,6 @@
     "react-dom": "^16.1.0",
     "release": "^2.5.6",
     "rollup": "^0.51.5",
-    "rollup-plugin-buble": "^0.17.0"
+    "rollup-plugin-buble": "^0.18.0"
   }
 }
