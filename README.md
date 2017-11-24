@@ -45,8 +45,8 @@ import { Mutate, Query } from "@department/apollo-component";
 import { Exception } from "components/Exception";
 
 const IncrementMutation = gql`
-  mutation IncrementMutation {
-    incr()
+  mutation IncrementMutation($num: Int!) {
+    incr(num: $num)
   }
 `;
 
@@ -62,7 +62,12 @@ const IncrementView = ({ id }) => (
       {({ data: { count } }) => <div>Current count: {count}</div>}
     </Query>
     <Mutate gql={IncrementMutation} refetchQueries={["ShowCount"]} fail>
-      {incr => <button onClick={incr}>+</button>}
+      {incr => (
+        <form onSubmit={e => incr({ num: e.currentTarget.num.valueAsNumber })}>
+          <input type="number" name="num" value={1} step={1} />
+          <button>+</button>
+        </form>
+      )}
     </Mutate>
   </Exception>
 );
