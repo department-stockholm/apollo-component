@@ -108,9 +108,7 @@ const IncrementView = ({ id }) => (
 ##### Example:
 
 ```js
-({ data: { stuff }, loading }) => (
-  <div>{loading ? "loading..." : data.stuff}</div>
-);
+({ data: { stuff }, loading }) => <div>{loading ? "loading..." : stuff}</div>;
 ```
 
 ### `<Mutate />`
@@ -137,7 +135,7 @@ const IncrementView = ({ id }) => (
 ```js
 (mutate, { data: { stuff }, loading }) => (
   <button onClick={() => mutate()} disabled={loading}>
-    {loading ? "loading..." : data.stuff}
+    {loading ? "loading..." : stuff}
   </button>
 );
 ```
