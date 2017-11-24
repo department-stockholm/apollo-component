@@ -10,7 +10,8 @@
     "watch": "onchange '*.js' -- rollup -c",
     "build": "rollup -c",
     "prepare": "rollup -c",
-    "release": "release"
+    "release": "release",
+    "postpublish": "release"
   },
   "author": "Robert Sköld (https://department.se)",
   "license": "ISC",
