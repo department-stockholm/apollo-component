@@ -1,6 +1,14 @@
 # Apollo Component
 
+[![npm version](https://badge.fury.io/js/%40department%2Fapollo-component.svg)](https://badge.fury.io/js/%40department%2Fapollo-component)
+
 A render component for easy querying and mutating of your GraphQL API.
+
+## Install
+
+```sh
+npm install @department/apollo-component
+```
 
 ## Examples
 
