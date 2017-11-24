@@ -2,7 +2,7 @@
 
 A render component for easy querying and mutating of your GraphQL API.
 
-## Example
+## Examples
 
 Here is an example of fetching and rendering the data of an imaginary `Order`.
 
@@ -35,11 +35,14 @@ const Show = ({ id }) => (
 ));
 ```
 
-And another example using `<Mutate/>`:
+And another example using `<Mutate/>` and `fail`-props to raise any errors to
+the nearest
+[React 16+ Error Boundary](https://reactjs.org/blog/2017/07/26/error-handling-in-react-16.html):
 
 ```js
-import { gql } from "graphql-tag"
-import { Mutate, Query } from "@department/apollo-component"
+import { gql } from "graphql-tag";
+import { Mutate, Query } from "@department/apollo-component";
+import { Exception } from "components/Exception";
 
 const IncrementMutation = gql`
   mutation IncrementMutation {
@@ -51,29 +54,18 @@ const ShowCountQuery = gql`
   query ShowCount {
     count
   }
-`
+`;
 
-const IncrementView = ({ id }) => [
-  <Query gql={ShowCount} wait>{
-    ({ data: { count }, error }) =>
-      error ? (
-        <div>Failed: {error.message}</div>
-      ) : (
-        <div>Current count: {count}</div>
-      )
-  }</Query>
-  ,
-  <Mutate gql={IncrementMutation} refetchQueries={["ShowCount"]}>{
-    (incr, {error, loading}) =>
-      loading ? (
-        <div>Saving...</div>
-      ) : error ? (
-        <div>Failed: {error.message}</div>
-      ) : (
-        <button onClick={incr}>+</button>
-      )
-  }</Mutate>
-));
+const IncrementView = ({ id }) => (
+  <Exception>
+    <Query gql={ShowCount} wait fail>
+      {({ data: { count } }) => <div>Current count: {count}</div>}
+    </Query>
+    <Mutate gql={IncrementMutation} refetchQueries={["ShowCount"]} fail>
+      {incr => <button onClick={incr}>+</button>}
+    </Mutate>
+  </Exception>
+);
 ```
 
 ## API
