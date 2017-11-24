@@ -83,9 +83,9 @@ const IncrementView = ({ id }) => (
 
 ## API
 
-### <Query />
+### `<Query />`
 
-Available Props:
+[Available Props](https://github.com/department-stockholm/apollo-component/blob/master/Query.js#L142-L187):
 
 * `gql`
 * `wait`
@@ -93,30 +93,51 @@ Available Props:
 * `fail`
 * `variables`
 
-Arguments in render callback:
+#### Arguments in render callback
 
-* QueryResults
-  * `data`
-  * `loading`
-  * `error`
-  * `refetch`
-  * `fetchMore`
+* _QueryResults_
+  * `data` the loaded data or an empty object
+  * `loading` true while loading (unless the `wait`-prop was set)
+  * `error` Error object if there was any error (unless the `fail`-props was
+    set)
+  * `refetch(variables)` call this function rerun query with, optionally, new
+    variables
+  * `fetchMore(opts)` call this function to fetch more (read about the
+    [opts](https://www.apollographql.com/docs/react/basics/queries.html#graphql-query-data-fetchMore))
 
-### <Mutate />
+##### Example:
 
-Available Props:
+```js
+({ data: { stuff }, loading }) => (
+  <div>{loading ? "loading..." : data.stuff}</div>
+);
+```
+
+### `<Mutate />`
+
+[Available Props](https://github.com/department-stockholm/apollo-component/blob/master/Mutate.js#L86-L106):
 
 * `gql`
 * `refetchQueries`
 * `optimisticResponse`
 * `update`
 
-Arguments in render callback:
+#### Arguments in render callback
 
-* Mutate(variables)
-* QueryResults
+* `Mutate(variables)` call this function to trigger the mutation
+* _QueryResults_ (same as for Query)
   * `data`
   * `loading`
   * `error`
   * `refetch`
   * `fetchMore`
+
+##### Example:
+
+```js
+(mutate, { data: { stuff }, loading }) => (
+  <button onClick={() => mutate()} disabled={loading}>
+    {loading ? "loading..." : data.stuff}
+  </button>
+);
+```
