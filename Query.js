@@ -97,7 +97,7 @@ export class Query extends React.Component {
     };
   }
 
-  refetch(vars) {
+  refetch(vars = this.props.variables) {
     if (this.observable) {
       return this.observable.refetch(vars);
     }
