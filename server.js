@@ -1,4 +1,3 @@
-import { createElement } from "react";
 import { render } from "react-dom";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Provider } from "./Provider";
@@ -13,7 +12,11 @@ export const renderState = (client, component, { depth = Infinity } = {}) => {
 
   const render = () => {
     const queries = [];
-    renderer(createElement(Provider, { client, queries }, component));
+    renderer(
+      <Provider client={client} queries={queries}>
+        {component}
+      </Provider>
+    );
 
     const queue = queries
       .filter(q => q.currentResult().loading)
