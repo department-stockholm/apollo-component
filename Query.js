@@ -99,7 +99,10 @@ export class Query extends React.Component {
 
   refetch(vars = this.props.variables) {
     if (this.observable) {
-      return this.observable.refetch(vars);
+      // special case for when vars are event
+      // ex. <button onClick={refetch} />
+      const isPlainObj = typeof vars == "object" && vars.constructor == Object;
+      return this.observable.refetch(isPlainObj ? vars : undefined);
     }
   }
 
