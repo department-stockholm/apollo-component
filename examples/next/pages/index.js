@@ -20,6 +20,13 @@ const List = ({}) => (
       ) : (
         [
           allOrders.map((order, i) => <OrderRow key={i} {...order} />),
+          <button
+            key="btn-10"
+            type="button"
+            onClick={() => refetch({ count: 10 })}
+          >
+            Refetch w. count: 10
+          </button>,
           <button key="btn" type="button" onClick={refetch}>
             Refetch
           </button>,
@@ -35,7 +42,8 @@ const List = ({}) => (
                     ...fetchMoreResult.allOrders
                   ]
                 })
-              })}
+              })
+            }
           >
             More
           </button>,
@@ -62,7 +70,8 @@ const List = ({}) => (
             )}
           </Mutate>
         ]
-      )}
+      )
+    }
   </Query>
 );
 
@@ -75,7 +84,8 @@ const Posts = withRouter(({ router: { query } }) => (
         <span>Error while loading posts: {error.message}</span>
       ) : (
         allPosts.map(p => <span key={p.id}>{p.id}</span>)
-      )}
+      )
+    }
   </Query>
 ));
 
@@ -87,8 +97,9 @@ const Error = withRouter(({ router: { query } }) => (
       ) : error ? (
         <span>Error while loading posts: {error.message}</span>
       ) : (
-        allPosts.map(p => <span key={p.id}>{p.id}</span>)
-      )}
+        allPosts.map(p => <div key={p.id}>{p.id}</div>)
+      )
+    }
   </Query>
 ));
 
@@ -121,8 +132,8 @@ const AddOrderMutation = gql`
 `;
 
 const ListOrderQuery = gql`
-  query ListOrder ($after: String) {
-    allOrders(first: 2, after: $after, orderBy: name_ASC) {
+  query ListOrder ($after: String, $count: Int = 2) {
+    allOrders(first: $count, after: $after, orderBy: name_ASC) {
       ...OrderRow
     }
   }
@@ -138,7 +149,8 @@ const Show = withRouter(({ router: { query } }) => (
         <span>{"Not Found"}</span>
       ) : (
         <SingleOrder {...Order} />
-      )}
+      )
+    }
   </Query>
 ));
 
