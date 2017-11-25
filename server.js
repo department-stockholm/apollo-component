@@ -1,17 +1,22 @@
+import React from "react";
 import { render } from "react-dom";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Provider } from "./Provider";
 
 function renderToDOM(component) {
-  const element = document.createDocumentFragment();
-  render(component, element);
+  render(component, document.createDocumentFragment());
 }
 
-export const renderState = (client, component, { depth = Infinity } = {}) => {
+export const renderState = (
+  client,
+  component,
+  { maxDepth = Infinity } = {}
+) => {
   const renderer = client.ssrMode ? renderToStaticMarkup : renderToDOM;
 
-  const render = () => {
+  const render = (depth = 0) => {
     const queries = [];
+
     renderer(
       <Provider client={client} queries={queries}>
         {component}
@@ -26,7 +31,7 @@ export const renderState = (client, component, { depth = Infinity } = {}) => {
       return (
         Promise.all(queue)
           // try to go deeper if we succeed
-          .then(() => --depth && render())
+          .then(() => depth < maxDepth && render(depth + 1))
       );
     }
 
