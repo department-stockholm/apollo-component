@@ -139,3 +139,49 @@ const IncrementView = ({ id }) => (
   </button>
 );
 ```
+
+### `renderState(client, component, options)`
+
+For server side rendering `renderState()` may be used. It uses a query queue in
+the React Context which is populated by `<Query/>` in its `componentWillMount()`
+lifecycle method using a naïve component renderer.
+
+It will by default render the tree repeatedly until all queries, without the
+`lazy`-prop has been completed but the maximum "depth" may be adjusted with the
+`maxDepth` option.
+
+#### Arguments
+
+* `client` an instance of ApolloClient
+* `component` the root component, will be wrapped by a `<Provider />` with a
+  queue
+* _RenderStateOptions_
+  * `maxDepth` number of attempts to render the tree, defaults to `Infinity`
+    (until no more queries are to be found)
+
+#### Example
+
+An example which could be used to server side render.
+
+Note how the `<Provider/>` is not needed in `renderState()`, it's because it
+wraps the component with a special one.
+
+```js
+function renderHTML() {
+  return renderState(client, <App />, { maxDepth: 1 })
+    .then(() =>
+      ReactDOM.renderToString(
+        <Provider client={client}>
+          <App />
+        </Provider>
+      )
+    )
+    .catch(err => {
+      // you can let the error throw here
+      // or ignore it and let the client side
+      // handle it inline
+      console.error("failed to render state:", err);
+      return renderErrorPage(err);
+    });
+}
+```
