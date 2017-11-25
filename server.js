@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { Provider } from "./Provider";
 
 function renderToDOM(component) {
-  const element = document.createElement("div");
+  const element = document.createDocumentFragment();
   render(component, element);
 }
 
