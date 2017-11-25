@@ -76,7 +76,7 @@ const List = ({}) => (
 );
 
 const Posts = withRouter(({ router: { query } }) => (
-  <Query gql={ListPostsQuery} lazy={query.lazy}>
+  <Query gql={ListPostsQuery} lazy={!!query.lazy}>
     {({ loading, data: { allPosts }, error }) =>
       loading ? (
         <div>Loading posts</div>
@@ -90,7 +90,7 @@ const Posts = withRouter(({ router: { query } }) => (
 ));
 
 const Error = withRouter(({ router: { query } }) => (
-  <Query gql={ListInvalidPostsQuery} fail={query.fail}>
+  <Query gql={ListInvalidPostsQuery} fail={!!query.fail}>
     {({ loading, data: { allPosts }, error }) =>
       loading ? (
         <div>Loading posts</div>
