@@ -1,6 +1,13 @@
 import { createElement, Children } from "react";
 import { Provider } from "./Provider";
 
+// renderState will wrap a component with a "special" <Provider /> that
+// has a query-queue on its context. This is then used by <Query /> in
+// its `componentWillMount()`-lifecycle method for queuing up its
+// query as defined by its props.
+//
+// it will keep re-rendering the tree until we run out of nested queries
+// or we reach the assigned maxDepth option
 export const renderState = (
   client,
   component,
@@ -26,6 +33,9 @@ export const renderState = (
   return render();
 };
 
+// renderElement is a very simple way to render a React element tree
+// without any magic. Since we keep track using the context we only
+// need the lifecycle method anyway.
 const renderElement = (element, context = {}) => {
   if (Array.isArray(element)) {
     // react 16 array of children
