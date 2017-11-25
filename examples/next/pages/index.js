@@ -79,11 +79,11 @@ const Posts = withRouter(({ router: { query } }) => (
   <Query gql={ListPostsQuery} lazy={query.lazy}>
     {({ loading, data: { allPosts }, error }) =>
       loading ? (
-        <span>Loading posts</span>
+        <div>Loading posts</div>
       ) : error ? (
-        <span>Error while loading posts: {error.message}</span>
+        <div>Error while loading posts: {error.message}</div>
       ) : (
-        allPosts.map(p => <span key={p.id}>{p.id}</span>)
+        allPosts.map(p => <div key={p.id}>{p.id}</div>)
       )
     }
   </Query>
@@ -93,9 +93,9 @@ const Error = withRouter(({ router: { query } }) => (
   <Query gql={ListInvalidPostsQuery} fail={query.fail}>
     {({ loading, data: { allPosts }, error }) =>
       loading ? (
-        <span>Loading posts</span>
+        <div>Loading posts</div>
       ) : error ? (
-        <span>Error while loading posts: {error.message}</span>
+        <div>Error while loading posts: {error.message}</div>
       ) : (
         allPosts.map(p => <div key={p.id}>{p.id}</div>)
       )

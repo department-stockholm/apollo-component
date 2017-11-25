@@ -65,10 +65,14 @@ export class Query extends React.Component {
     this.observable.setOptions(propsToOptions(props));
 
     if (!this.subscription) {
+      let debounce;
       const update = () => {
-        if (this.mounted) {
-          this.forceUpdate();
-        }
+        cancelAnimationFrame(debounce);
+        debounce = requestAnimationFrame(() => {
+          if (this.mounted) {
+            this.forceUpdate();
+          }
+        });
       };
       this.subscription = this.observable.subscribe({
         next: update,
@@ -81,15 +85,14 @@ export class Query extends React.Component {
     const currentResult = this.observable.currentResult();
     const { loading, error } = currentResult;
     const data = {};
+
     // Let's do what we can to give the user data
-    if (loading) {
-      Object.assign(data, this.previousData, currentResult.data);
-    } else if (error) {
+    if (error) {
       Object.assign(data, (this.observable.getLastResult() || {}).data);
     } else {
-      this.previousData = currentResult.data;
-      Object.assign(data, currentResult.data);
+      Object.assign(data, this.previousData, currentResult.data);
     }
+    this.previousData = data;
     return {
       loading,
       error,
