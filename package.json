@@ -20,15 +20,13 @@
   "license": "ISC",
   "peerDependencies": {
     "prop-types": "*",
-    "react": "*",
-    "react-dom": "*"
+    "react": "*"
   },
   "devDependencies": {
     "jest": "^21.2.1",
     "onchange": "^3.2.1",
     "prop-types": "^15.6.0",
     "react": "^16.1.0",
-    "react-dom": "^16.1.0",
     "release": "^2.5.6",
     "rollup": "^0.51.5",
     "rollup-plugin-buble": "^0.18.0"

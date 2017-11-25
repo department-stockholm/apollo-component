@@ -65,15 +65,11 @@ export class Query extends React.Component {
     this.observable.setOptions(propsToOptions(props));
 
     if (!this.subscription) {
-      let debounce;
-      const update = () => {
-        cancelAnimationFrame(debounce);
-        debounce = requestAnimationFrame(() => {
-          if (this.mounted) {
-            this.forceUpdate();
-          }
-        });
-      };
+      const update = debounce(() => {
+        if (this.mounted) {
+          this.forceUpdate();
+        }
+      });
       this.subscription = this.observable.subscribe({
         next: update,
         error: update
@@ -214,4 +210,12 @@ function shallowEquals(a, b) {
   for (let key in a) if (a[key] !== b[key]) return false;
   for (let key in b) if (!(key in a)) return false;
   return true;
+}
+
+function debounce(fn) {
+  let x;
+  return function() {
+    cancelAnimationFrame(x);
+    x = requestAnimationFrame(fn.bind(null, arguments));
+  };
 }

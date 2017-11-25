@@ -25,18 +25,25 @@ export default Component =>
         asPath: ctx.asPath
       };
 
+      console.time("renderState");
       try {
         await renderState(
           client,
           <RouterContext router={router}>
             <Component query={ctx.query} />
-          </RouterContext>
+          </RouterContext>,
+          {
+            maxDepth:
+              ctx.query.maxDepth !== undefined ? +ctx.query.maxDepth : Infinity
+          }
         );
       } catch (err) {
         // you can let the error throw here
         // or ignore it and let the client side
         // handle it inline
+        console.error("failed to render state:", err);
       }
+      console.timeEnd("renderState");
 
       let props = {};
       if (Component.getInitialProps) {
