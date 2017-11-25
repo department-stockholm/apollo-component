@@ -15,9 +15,9 @@ export const renderState = (
 ) => {
   const render = (depth = 0) => {
     if (depth < maxDepth) {
-      const queries = [];
-      renderElement(createElement(Provider, { client, queries }, component));
-      const queue = queries
+      const queued = [];
+      renderElement(createElement(Provider, { client, queued }, component));
+      const queue = queued
         .filter(q => q.currentResult().loading)
         .map(q => q.result());
       if (queue.length) {

@@ -20,7 +20,7 @@ export class Query extends React.Component {
   }
 
   componentWillMount() {
-    const { client, queries } = this.context.apollo || {};
+    const { client, queued } = this.context.apollo || {};
     if (!client) {
       throw new Error(
         "missing apollo client in context. is there a <Provider /> ancestor component?"
@@ -29,8 +29,8 @@ export class Query extends React.Component {
 
     this.observable = client.watchQuery(propsToOptions(this.props));
 
-    if (!this.props.lazy && queries) {
-      queries.push(this.observable);
+    if (!this.props.lazy && queued) {
+      queued.push(this.observable);
     }
   }
 
@@ -137,7 +137,7 @@ export class Query extends React.Component {
 Query.contextTypes = {
   apollo: PropTypes.shape({
     client: PropTypes.object.isRequired,
-    queries: PropTypes.array
+    queued: PropTypes.array
   }).isRequired
 };
 
