@@ -1,0 +1,28 @@
+{
+  "name": "next",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@department/apollo-component": "*",
+    "antd": "^2.13.10",
+    "apollo-client-preset": "1.0.2",
+    "babel-plugin-module-resolver": "^3.0.0",
+    "graphql": "^0.11.7",
+    "graphql-tag": "^2.5.0",
+    "isomorphic-unfetch": "^2.0.0",
+    "next": "^4.1.4",
+    "prop-types": "^15.6.0",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0"
+  }
+}
