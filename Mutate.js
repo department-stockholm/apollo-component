@@ -69,8 +69,8 @@ export class Mutate extends React.Component {
 
   render() {
     // <Mutate fail> will throw the error instead of using the callback
-    if (this.props.fail && state.error) {
-      throw state.error;
+    if (this.props.fail && this.state.error) {
+      throw this.state.error;
     }
 
     return (this.props.render || this.props.children)(this.mutate, this.state);
