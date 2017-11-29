@@ -45,6 +45,10 @@ export class Mutate extends React.Component {
     if (!isPlainObject(variables)) {
       variables = undefined;
     }
+    // default to variables prop
+    if (typeof variables == "undefined") {
+      variables = this.props.variables;
+    }
     const { client } = this.context.apollo;
     const { gql, refetchQueries, optimisticResponse, update } = this.props;
     const req = client.mutate({
@@ -93,6 +97,10 @@ Mutate.contextTypes = {
 Mutate.propTypes = {
   // A graphql-tag compiled gql query
   gql: PropTypes.object.isRequired,
+
+  // Default variables passed into the Mutation
+  // (when no variables are passed into the mutation callback)
+  variables: PropTypes.object,
 
   // Fail by throwing an exception and letting the React error boundary
   // take care of it instead of passing the error into the render callback
