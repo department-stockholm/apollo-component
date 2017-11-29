@@ -2,17 +2,15 @@ import React from "react";
 import gql from "graphql-tag";
 import { Form, Input, Button } from "antd";
 
-import File from "components/File";
-
-class PostFormView extends React.Component {
+class FileFormView extends React.Component {
   onSubmit = e => {
-    const { form, post, onSubmit } = this.props;
+    const { form, file, onSubmit } = this.props;
     e.preventDefault();
 
     form.validateFields((err, values) => {
       if (!err) {
         onSubmit({
-          id: post.id,
+          id: file.id,
           ...values
         });
       }
@@ -20,23 +18,17 @@ class PostFormView extends React.Component {
   };
 
   render() {
-    const { post, onDestroy } = this.props;
+    const { file, onDestroy } = this.props;
     const { getFieldDecorator } = this.props.form;
     return (
       <Form onSubmit={this.onSubmit}>
         <Form.Item>
-          {getFieldDecorator("title", {
-            initialValue: post.title,
+          {getFieldDecorator("name", {
+            initialValue: file.name,
             rules: [
-              { required: true, message: "Please input a title for the post" }
+              { required: true, message: "Please input a name for the asset" }
             ]
-          })(<Input placeholder="Title" />)}
-        </Form.Item>
-
-        <Form.Item>
-          {getFieldDecorator("excerpt", {
-            initialValue: post.excerpt
-          })(<Input.TextArea placeholder="Excerpt" />)}
+          })(<Input placeholder="Name" />)}
         </Form.Item>
 
         <Button type="primary" htmlType="submit" className="login-form-button">
@@ -56,18 +48,16 @@ class PostFormView extends React.Component {
     );
   }
 }
-export const PostForm = Form.create()(PostFormView);
+export const FileForm = Form.create()(FileFormView);
 
 export const fragments = {
-  EditPost: gql`
-    fragment EditPost on Post {
+  EditFile: gql`
+    fragment EditFile on File {
       id
-      title
-      excerpt
-      files {
-        ...EditFile
-      }
+      contentType
+      name
+      size
+      url
     }
-    ${File.fragments.EditFile}
   `
 };

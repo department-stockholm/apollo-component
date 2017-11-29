@@ -1,6 +1,8 @@
 import React from "react";
 import gql from "graphql-tag";
+import Router from "next/router";
 import { Query, Mutate } from "@department/apollo-component";
+import { Layout as AntLayout } from "antd";
 
 import { Layout } from "components/Layout";
 import withApollo from "components/withApollo";
@@ -13,9 +15,23 @@ const Edit = ({ query: { id } }) => (
         <Mutate gql={UpdatePostMutation} refetchQueries={["GetPost"]} fail>
           {(update, updating) => (
             <Query gql={GetPostQuery} variables={{ id }} wait fail>
-              {({ data: { Post } }) => (
-                <PostForm onSubmit={update} post={Post} />
-              )}
+              {({ data: { Post } }) =>
+                Post ? (
+                  <PostForm
+                    onSubmit={async vars => {
+                      await update(vars);
+                      Router.push("/posts");
+                    }}
+                    onDestroy={async () => {
+                      await destroy();
+                      Router.replace("/posts");
+                    }}
+                    post={Post}
+                  />
+                ) : (
+                  Router.replace("/posts")
+                )
+              }
             </Query>
           )}
         </Mutate>
@@ -43,6 +59,7 @@ const DeletePostMutation = gql`
 
 const UpdatePostMutation = gql`
   mutation UpdatePost($id: ID!, $title: String!, $excerpt: String) {
+    # $title
     updatePost(id: $id, title: $title, excerpt: $excerpt) {
       id
     }

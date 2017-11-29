@@ -3,10 +3,10 @@ import Router, { withRouter } from "next/router";
 import { Layout as AntLayout, Menu, Icon } from "antd";
 const { Header, Content, Footer, Sider } = AntLayout;
 
-export const Layout = ({ children }) => (
+export const Layout = ({ title, children }) => (
   <AntLayout>
     <Head>
-      <title>CMS</title>
+      <title>{title ? title + " - " : ""}CMS</title>
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <meta charSet="utf-8" />
       <link
@@ -16,7 +16,7 @@ export const Layout = ({ children }) => (
     </Head>
     <Navigation />
     <AntLayout style={{ marginLeft: 200 }}>
-      <Header style={{ background: "#fff", padding: 0 }} />
+      <Header />
       <Content style={{ margin: "24px 16px 0", overflow: "initial" }}>
         {children}
       </Content>

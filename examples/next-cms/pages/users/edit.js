@@ -1,7 +1,7 @@
 import React from "react";
 import gql from "graphql-tag";
 import { Query, Mutate } from "@department/apollo-component";
-import { Card, Row, Col } from "antd";
+import { Card, Row, Col, Layout } from "antd";
 
 import { Layout } from "components/Layout";
 import withApollo from "components/withApollo";

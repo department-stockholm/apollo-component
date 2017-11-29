@@ -2,35 +2,46 @@ import React from "react";
 import gql from "graphql-tag";
 import Link from "next/link";
 import { Query, Mutate } from "@department/apollo-component";
-import { Table, Column, Button } from "antd";
+import { Table, Column, Button, Popconfirm } from "antd";
 
 import { Layout } from "components/Layout";
 import withApollo from "components/withApollo";
 
 const List = ({}) => (
   <Layout>
-    <Mutate gql={DeletePostMutation} wait fail>
-      {(destroy, { loading }) => (
-        <Query gql={ListPostsQuery} wait fail>
-          {({ data: { allPosts } }) => (
-            <Table dataSource={allPosts}>
+    <Mutate gql={DeletePostMutation} fail>
+      {(destroy, destroying) => (
+        <Query gql={ListPostsQuery} fail>
+          {({ data: { allPosts }, loading }) => (
+            <Table
+              rowSelection={{
+                onChange: (selectedRowKeys, selectedRows) => {
+                  console.log(
+                    `selectedRowKeys: ${selectedRowKeys}`,
+                    "selectedRows: ",
+                    selectedRows
+                  );
+                }
+              }}
+              dataSource={allPosts}
+              loading={loading}
+            >
               <Column title="Title" dataIndex="title" key="title" />
               <Column
                 title="Action"
                 key="action"
-                render={(text, { id }) => (
+                render={(text, { id, title }) => (
                   <span>
                     <Link href={`/posts/edit?id=${id}`}>
                       <a>Edit</a>
                     </Link>
                     <span className="ant-divider" />
-                    <Button
-                      type="danger"
-                      loading={loading}
-                      onClick={e => destroy({ id })}
+                    <Popconfirm
+                      title={`Are you sure delete "${title}"?`}
+                      onConfirm={() => destroy({ id })}
                     >
-                      Delete
-                    </Button>
+                      <a href="#">Delete</a>
+                    </Popconfirm>
                   </span>
                 )}
               />
