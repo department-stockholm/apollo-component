@@ -1,6 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 
+import isPlainObject from "./isPlainObject";
+
 /**
  * Example:
  *
@@ -38,6 +40,11 @@ export class Mutate extends React.Component {
   }
 
   mutate(variables) {
+    // special case for when vars are event
+    // ex. <button onClick={mutate} />
+    if (!isPlainObject(variables)) {
+      variables = undefined;
+    }
     const { client } = this.context.apollo;
     const { gql, refetchQueries, optimisticResponse, update } = this.props;
     const req = client.mutate({

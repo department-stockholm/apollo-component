@@ -1,6 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 
+import isPlainObject from "./isPlainObject";
+
 /**
  * Example:
  *
@@ -100,8 +102,7 @@ export class Query extends React.Component {
     if (this.observable) {
       // special case for when vars are event
       // ex. <button onClick={refetch} />
-      const isPlainObj = typeof vars == "object" && vars.constructor == Object;
-      return this.observable.refetch(isPlainObj ? vars : undefined);
+      return this.observable.refetch(isPlainObject(vars) ? vars : undefined);
     }
   }
 
