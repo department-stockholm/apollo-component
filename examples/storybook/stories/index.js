@@ -1,16 +1,27 @@
 import React from "react";
 import gql from "graphql-tag";
-import { Provider, Query } from "@department/apollo-component";
-import { ApolloClient } from "@department/apollo-component/mock";
+import { Provider, Query, MockClient } from "@department/apollo-component";
 
 import { storiesOf } from "@storybook/react";
 import { action } from "@storybook/addon-actions";
 import { linkTo } from "@storybook/addon-links";
 
+const FakeQuery = gql`
+  query GetStuff {
+    stuff {
+      id
+    }
+  }
+`;
+
 storiesOf("Query", module)
   .addDecorator(story => (
-    <Provider client={new ApolloClient([])}>{story}</Provider>
+    <Provider client={new MockClient([])}>{story}</Provider>
   ))
   .add("empty", () => (
-    <Query gql={}>{({data}) => <span>{data}</span>}</Query>
-  ))
+    <Query gql={FakeQuery}>
+      {({ data: { stuff }, loading, error }) => (
+        <span>{loading ? "loading..." : error ? "error" : stuff.id}</span>
+      )}
+    </Query>
+  ));

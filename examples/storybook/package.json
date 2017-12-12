@@ -5,20 +5,22 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "start": "start-storybook -p 6006",
+    "build": "build-storybook"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@department/apollo-component": "../..",
+    "graphql": "^0.11.7",
+    "graphql-tag": "^2.6.0",
     "react": "latest",
     "react-dom": "latest"
   },
   "devDependencies": {
-    "@storybook/react": "^3.2.12",
     "@storybook/addon-actions": "^3.2.12",
-    "@storybook/addon-links": "^3.2.12"
+    "@storybook/addon-links": "^3.2.12",
+    "@storybook/react": "^3.2.12"
   }
 }
