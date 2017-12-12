@@ -2,8 +2,7 @@ import { Router } from "next/router";
 import fetch from "isomorphic-unfetch";
 import React from "react";
 import PropTypes from "prop-types";
-import { Provider } from "@department/apollo-component";
-import { renderState } from "@department/apollo-component/state";
+import { Provider, renderState } from "@department/apollo-component";
 import ApolloClient, { ApolloLink, HttpLink } from "apollo-client-preset";
 
 export default Component =>
