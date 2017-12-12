@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import isPlainObject from "./isPlainObject";
+import { isPlainObject } from "./util";
 
 /**
  * Example:
@@ -56,6 +56,9 @@ export class Query extends React.Component {
 
   componentWillReceiveProps(nextProps, nextContext) {
     if (nextProps.gql !== this.props.gql) {
+      return this.request(nextProps);
+    }
+    if (nextProps.skip !== this.props.skip) {
       return this.request(nextProps);
     }
     if (!shallowEquals(this.props.variables, nextProps.variables)) {
@@ -155,6 +158,10 @@ Query.propTypes = {
 
   // Lazy load server side
   lazy: PropTypes.bool,
+
+  // Control if query should be skipped.
+  // Set to `true` and control the query using `refetch()`
+  skip: PropTypes.bool,
 
   // Fail by throwing an exception and letting the React error boundary
   // take care of it instead of passing the error into the render callback

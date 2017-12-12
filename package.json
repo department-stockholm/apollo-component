@@ -5,15 +5,24 @@
   "repository": "department-stockholm/apollo-component",
   "homepage": "https://github.com/department-stockholm/apollo-component",
   "bugs": "https://github.com/department-stockholm/apollo-component/issues",
-  "main": "dist/index.cjs.js",
+  "source": "src/index.js",
+  "main": "dist/index.js",
   "jsnext:main": "dist/index.esm.mjs",
   "module": "dist/index.esm.mjs",
+  "browser": "dist/index.umd.js",
+  "umd:main": "dist/index.umd.js",
   "scripts": {
     "test": "jest",
-    "watch": "onchange '*.js' -- rollup -c",
-    "build": "rollup -c",
-    "prepare": "rollup -c",
-    "release": "release"
+    "watch": "microbundle watch --strict --no-compress",
+    "build": "npm run build:main && npm run build:mock && npm run build:state",
+    "build:main": "microbundle build --strict",
+    "build:mock": "microbundle build --strict src/mock/*.js -o mock.js -f cjs",
+    "build:state":
+      "microbundle build --strict src/state/*.js -o state.js -f cjs",
+    "clean": "rm dist/* state.js* mock.js*",
+    "prepare": "npm run build",
+    "release": "release",
+    "postpublish": "npm run clean"
   },
   "author": "Robert Sköld (https://department.se)",
   "license": "ISC",
@@ -23,11 +32,9 @@
   },
   "devDependencies": {
     "jest": "^21.2.1",
-    "onchange": "^3.2.1",
+    "microbundle": "^0.2.3",
     "prop-types": "^15.6.0",
-    "react": "^16.1.0",
-    "release": "^3.0.1",
-    "rollup": "^0.51.5",
-    "rollup-plugin-buble": "^0.18.0"
+    "react": "^16.2.0",
+    "release": "^3.0.2"
   }
 }

@@ -1,3 +1,6 @@
 *
-!dist/
+!src/*
+!dist/*
+!mock.js
+!state.js
 !package.json

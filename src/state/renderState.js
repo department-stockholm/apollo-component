@@ -1,5 +1,5 @@
 import { createElement, Children } from "react";
-import { Provider } from "./Provider";
+import { Provider } from "../Provider";
 
 // renderState will wrap a component with a "special" <Provider /> that
 // has a query-queue on its context. This is then used by <Query /> in

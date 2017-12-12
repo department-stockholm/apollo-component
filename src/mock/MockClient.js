@@ -1,7 +1,7 @@
 /**
  * Example:
  *
- * const mockClient = new MockClient({
+ * const mockClient = new ApolloClient({
  *  quer
  * })
  * const LayoutWithData = () =>
@@ -9,19 +9,17 @@
  *    <Layout>{children}</Layout>
  *  </Provider>
  */
-export class MockClient {
+export class ApolloClient {
   constructor(mocks) {
     this.mocks = mocks;
   }
 
-  mutate(options) {
-    return new Promise(resolve => resolve());
-  }
+  async mutate(options) {}
 
   watchQuery(options) {
     return {
-      refetch: options => new Promise(resolve => resolve()),
-      fetchMore: options => new Promise(resolve => resolve()),
+      refetch: async options => {},
+      fetchMore: async options => {},
       subscribe: ({ next, error }) => ({
         unsubscribe: () => {}
       })

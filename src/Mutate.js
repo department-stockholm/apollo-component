@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import isPlainObject from "./isPlainObject";
+import { isPlainObject } from "./util";
 
 /**
  * Example:

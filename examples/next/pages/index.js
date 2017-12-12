@@ -8,10 +8,10 @@ import { OrderRow, LoadingOrderRow } from "../components/OrderRow";
 import { SingleOrder } from "../components/SingleOrder";
 
 const Root = ({ query }) =>
-  query.error ? <Error /> : query.id ? <Show /> : <List />;
+  query.error ? <Error /> : query.id ? <Show /> : <List skip={!!query.skip} />;
 
-const List = ({}) => (
-  <Query gql={ListOrderQuery}>
+const List = ({ skip }) => (
+  <Query gql={ListOrderQuery} skip={skip}>
     {({ data: { allOrders }, error, loading, refetch, fetchMore }) =>
       loading ? (
         Array.from({ length: 5 }).map((_, i) => <LoadingOrderRow key={i} />)
