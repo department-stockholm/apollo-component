@@ -1,4 +1,0 @@
-{
-  // required or it will bubble up to the apollo-component .babelrc
-  "presets": ["next/babel"]
-}
