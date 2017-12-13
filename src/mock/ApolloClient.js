@@ -20,6 +20,9 @@ export class ApolloClient {
     return {
       refetch: async options => {},
       fetchMore: async options => {},
+      setOptions: () => {},
+      getLastResult: () => {},
+      currentResult: () => ({ loading: false, error: null, data: {} }),
       subscribe: ({ next, error }) => ({
         unsubscribe: () => {}
       })
