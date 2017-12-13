@@ -1,6 +1,6 @@
 {
   "name": "@department/apollo-component",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "Render component for your Apollo Client",
   "repository": "department-stockholm/apollo-component",
   "homepage": "https://github.com/department-stockholm/apollo-component",
@@ -17,8 +17,7 @@
     "build": "npm run build:main && npm run build:mock && npm run build:state",
     "build:main": "microbundle build --strict",
     "build:mock": "microbundle build --strict src/mock/*.js -o mock.js -f cjs",
-    "build:state":
-      "microbundle build --strict src/state/*.js -o state.js -f cjs",
+    "build:state": "microbundle build --strict src/state/*.js -o state.js -f cjs",
     "clean": "rm dist/* state.js* mock.js*",
     "prepare": "npm run build",
     "release": "release",
