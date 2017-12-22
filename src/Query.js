@@ -105,13 +105,27 @@ export class Query extends React.Component {
     if (this.observable) {
       // special case for when vars are event
       // ex. <button onClick={refetch} />
-      return this.observable.refetch(isPlainObject(vars) ? vars : undefined);
+      const req = this.observable.refetch(
+        isPlainObject(vars) ? vars : undefined
+      );
+      // when not wait we trigger a render
+      // so that a loader can be shown
+      if (!this.props.wait) {
+        this.forceUpdate();
+      }
+      return req;
     }
   }
 
   fetchMore(opts) {
     if (this.observable) {
-      return this.observable.fetchMore(opts);
+      const req = this.observable.fetchMore(opts);
+      // when not wait we trigger a render
+      // so that a loader can be shown
+      if (!this.props.wait) {
+        this.forceUpdate();
+      }
+      return req;
     }
   }
 
