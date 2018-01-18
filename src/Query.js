@@ -15,10 +15,13 @@ import { isPlainObject } from "./util";
  * }</Query>
  */
 export class Query extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.refetch = this.refetch.bind(this);
     this.fetchMore = this.fetchMore.bind(this);
+    this.state = {
+      skipped: this.shouldSkip(props)
+    };
   }
 
   componentWillMount() {
@@ -58,7 +61,10 @@ export class Query extends React.Component {
     if (nextProps.gql !== this.props.gql) {
       return this.request(nextProps);
     }
-    if (nextProps.skip !== this.props.skip) {
+    if (
+      typeof nextProps.skip === "boolean" &&
+      nextProps.skip !== this.props.skip
+    ) {
       return this.request(nextProps);
     }
     if (!shallowEquals(this.props.variables, nextProps.variables)) {
@@ -67,6 +73,15 @@ export class Query extends React.Component {
   }
 
   request(props) {
+    const skipped = this.shouldSkip(props);
+    // set state to make sure we render even
+    // if the request is skipped
+    this.setState({ skipped });
+    if (skipped) {
+      // skip the actual query
+      return;
+    }
+
     this.observable.setOptions(propsToOptions(props));
 
     if (!this.subscription) {
@@ -82,9 +97,36 @@ export class Query extends React.Component {
     }
   }
 
+  // check if we want to skip the query
+  // ex. show suggestions if there's not enough of characters
+  // or if we don't have any previous results
+  // otherwise show the loading bar while loading (the first time)
+  // or the results:
+  //  <Query
+  //    gql={SearchQuery}
+  //    skip={({q}) => q.length < 2}
+  //    variables={{q: "skipped"}}
+  //    render={({data: {results}, skipped, loading}) =>
+  //       skipped || !results
+  //         ? <Suggestions />
+  //         : loading
+  //           ? <Loader />
+  //           : <Results {...results} />
+  //    }
+  //  />
+  shouldSkip(props) {
+    if (typeof props.skip === "function") {
+      return !!props.skip(props.variables);
+    } else if (typeof props.skip === "boolean") {
+      return props.skip;
+    }
+    return false;
+  }
+
   getState() {
     const currentResult = this.observable.currentResult();
     const { loading, error } = currentResult;
+    const { skipped } = this.state;
     const data = {};
 
     // Let's do what we can to give the user data
@@ -95,6 +137,7 @@ export class Query extends React.Component {
     }
     this.previousData = data;
     return {
+      skipped,
       loading,
       error,
       data
@@ -175,7 +218,10 @@ Query.propTypes = {
 
   // Control if query should be skipped.
   // Set to `true` and control the query using `refetch()`
-  skip: PropTypes.bool,
+  // or to a function which accepts the current variables
+  // and returns a boolean controling if a request should
+  // be made. Rendering will still happen, with a skipped flag
+  skip: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
 
   // Fail by throwing an exception and letting the React error boundary
   // take care of it instead of passing the error into the render callback
