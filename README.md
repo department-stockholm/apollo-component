@@ -91,6 +91,7 @@ const IncrementView = ({ id }) => (
 * `wait`
 * `lazy`
 * `fail`
+* `skip`
 * `variables`
 
 #### Arguments in render callback
@@ -98,6 +99,7 @@ const IncrementView = ({ id }) => (
 * _QueryResults_
   * `data` the loaded data or an empty object
   * `loading` true while loading (unless the `wait`-prop was set)
+  * `skipped` true if the request was skipped (using the `skip`-prop)
   * `error` Error object if there was any error (unless the `fail`-props was
     set)
   * `refetch(variables)` call this function rerun query with, optionally, new
@@ -123,7 +125,7 @@ const IncrementView = ({ id }) => (
 #### Arguments in render callback
 
 * `Mutate(variables)` call this function to trigger the mutation
-* _QueryResults_ (same as for Query)
+* _QueryResults_ (like for Query but without `skipped`)
   * `data`
   * `loading`
   * `error`
