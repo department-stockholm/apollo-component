@@ -25,16 +25,10 @@ export class Query extends React.Component {
   }
 
   componentWillMount() {
-    const { client, queued } = this.context.apollo || {};
-    if (!client) {
-      throw new Error(
-        "missing apollo client in context. is there a <Provider /> ancestor component?"
-      );
-    }
+    const { queued } = this.context.apollo || {};
 
-    this.observable = client.watchQuery(propsToOptions(this.props));
-
-    if (!this.props.lazy && queued) {
+    // skip rendering if no
+    if (!this.props.lazy && !this.state.skipped && queued) {
       queued.push(this.observable);
     }
   }
@@ -52,8 +46,8 @@ export class Query extends React.Component {
       delete this.subscription;
     }
 
-    if (this.observable) {
-      delete this.observable;
+    if (this._o) {
+      delete this._o;
     }
   }
 
@@ -70,6 +64,19 @@ export class Query extends React.Component {
     if (!shallowEquals(this.props.variables, nextProps.variables)) {
       return this.request(nextProps);
     }
+  }
+
+  get observable() {
+    if (this._o) {
+      return this._o;
+    }
+    const { client } = this.context.apollo || {};
+    if (!client) {
+      throw new Error(
+        "missing apollo client in context. is there a <Provider /> ancestor component?"
+      );
+    }
+    return (this._o = client.watchQuery(propsToOptions(this.props)));
   }
 
   request(props) {

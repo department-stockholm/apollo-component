@@ -7,7 +7,7 @@ import { Query } from "@department/apollo-component";
 import withApollo from "../components/withApollo";
 
 class Search extends React.Component {
-  state = { q: "" };
+  state = {};
 
   query = e => {
     this.setState({ q: e.target.value });
@@ -28,7 +28,7 @@ const SearchResult = ({ q }) => (
     <Query
       gql={SearchQuery}
       variables={{ q }}
-      skip={q.length < 2} // try with just a bool
+      skip={({ q }) => !q || q.length < 2}
     >
       {({ data: { allPosts }, loading, skipped }) =>
         skipped || !allPosts ? (
@@ -52,7 +52,7 @@ const SearchResult = ({ q }) => (
 );
 
 const SearchQuery = gql`
-  query Search($q: String) {
+  query Search($q: String!) {
     allPosts(filter: { description_contains: $q }) {
       id
       description
