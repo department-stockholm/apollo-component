@@ -39,28 +39,39 @@ export class Mutate extends React.Component {
     this.mounted = false;
   }
 
-  mutate(variables) {
+  async mutate(vars) {
+    const { variables } = this.props;
+
     // special case for when vars are event
     // ex. <button onClick={mutate} />
-    if (!isPlainObject(variables)) {
-      variables = undefined;
+    if (!isPlainObject(vars)) {
+      vars = undefined;
     }
+
     // default to variables prop
-    if (typeof variables == "undefined") {
-      variables = this.props.variables;
+    if (typeof vars == "undefined") {
+      vars = variables;
     }
+
+    // map to variables if function
+    if (typeof variables == "function") {
+      vars = await Promise.resolve(variables(vars));
+    }
+
     const { client } = this.context.apollo;
     const { gql, refetchQueries, optimisticResponse, update } = this.props;
     const req = client.mutate({
       mutation: gql,
+      variables: vars,
       refetchQueries,
       optimisticResponse,
-      update,
-      variables
+      update
     });
 
     this.setState({ loading: true });
 
+    // returning `req` so the user
+    // also can track when its done and any errors
     req
       .then(res => {
         if (this.mounted) {
@@ -98,9 +109,13 @@ Mutate.propTypes = {
   // A graphql-tag compiled gql query
   gql: PropTypes.object.isRequired,
 
-  // Default variables passed into the Mutation
-  // (when no variables are passed into the mutation callback)
-  variables: PropTypes.object,
+  // Default variables passed into the Mutation (when no variables
+  // are passed into the mutation callback).
+  // May also be a function in which case it will take the variables
+  // passed into the mutate call and return the variables to use in
+  // the request.
+  // ex. <Mutate variables={(vars) => ({...vars, id: "1"})} />
+  variables: PropTypes.oneOfType([PropTypes.object, PropTypes.func]),
 
   // Fail by throwing an exception and letting the React error boundary
   // take care of it instead of passing the error into the render callback
