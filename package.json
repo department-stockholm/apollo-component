@@ -1,6 +1,6 @@
 {
   "name": "@department/apollo-component",
-  "version": "1.9.2",
+  "version": "1.10.0",
   "description": "Render component for your Apollo Client",
   "repository": "department-stockholm/apollo-component",
   "homepage": "https://github.com/department-stockholm/apollo-component",
