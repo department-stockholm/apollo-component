@@ -11,11 +11,9 @@
     "preserveConstEnums": true,
     "sourceMap": true,
     "skipLibCheck": true,
-    // "strict": true,
     "baseUrl": ".",
     "rootDir": "src",
     "typeRoots": ["./node_modules/@types"],
-    "lib": ["dom", "es2015", "es2016"],
-    "declaration": false
+    "lib": ["dom", "es2015", "es2016"]
   }
 }

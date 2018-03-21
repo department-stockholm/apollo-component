@@ -15,9 +15,9 @@
     "build": "npm run build:main && npm run build:mock && npm run build:state",
     "build:main": "microbundle build --external all --strict src/index.ts",
     "build:mock":
-      "microbundle build --external all --strict src/mock/*.ts -o mock.js -f cjs",
+      "microbundle build --external all --strict src/mock/*.ts -o mock.js -f cjs && rm -rf mock state *.d.ts",
     "build:state":
-      "microbundle build --external all --strict src/state/*.ts -o state.js -f cjs",
+      "microbundle build --external all --strict src/state/*.ts -o state.js -f cjs && rm -rf mock state **.d.ts",
     "clean": "rm -rf dist/* state.js* mock.js* mock state *.d.ts",
     "prepare": "npm run build",
     "release": "release",
