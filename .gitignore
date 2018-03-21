@@ -1,5 +1,7 @@
 node_modules
 .next
 dist
+*.d.ts
 mock.js*
 state.js*
+.rpt2_cache/

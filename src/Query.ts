@@ -1,7 +1,82 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { DocumentNode } from "graphql";
 
-import { isPlainObject } from "./util";
+import { isPlainObject, debounce, shallowEquals } from "./util";
+
+export interface SkipFunc {
+  (vars: object): boolean;
+}
+
+export interface RenderArgs<T> {
+  data: T;
+  error?: Error;
+  skipped: boolean;
+  loading: boolean;
+  refetch: Function;
+  fetchMore: Function;
+}
+
+export interface RenderFunc<T> {
+  (args: RenderArgs<T>): React.ReactNode;
+}
+
+export type QueryProps<T> = {
+  // A graphql-tag compiled gql query
+  gql: DocumentNode;
+
+  // Variables passed into the query
+  variables: object;
+
+  // Wait for loading to complete before rendering anything instead of
+  // passing loading boolean into the render callback
+  wait?: boolean;
+
+  // Lazy load server side
+  lazy?: boolean;
+
+  // Control if query should be skipped.
+  // Set to `true` and control the query using `refetch()`
+  // or to a function which accepts the current variables
+  // and returns a boolean controling if a request should
+  // be made. Rendering will still happen, with a skipped flag
+  skip?: boolean | SkipFunc;
+
+  // Fail by throwing an exception and letting the React error boundary
+  // take care of it instead of passing the error into the render callback
+  fail?: boolean;
+
+  // The time interval (in milliseconds) on which this query should be
+  // refetched from the server.
+  pollInterval?: number;
+
+  // Specifies the fetch policy to be used for this query
+  // see https://www.apollographql.com/docs/react/basics/queries.html#graphql-config-options-fetchPolicy
+  fetchPolicy?:
+    | "cache-first"
+    | "cache-and-network"
+    | "network-only"
+    | "cache-only";
+
+  // Specifies the error policy to be used for this query
+  // see https://www.apollographql.com/docs/react/basics/queries.html#graphql-config-options-errorPolicy
+  errorPolicy?: "none" | "ignore" | "all";
+
+  // Whether or not updates to the network status should trigger next on the observer of this query
+  notifyOnNetworkStatusChange?: boolean;
+
+  // Context to pass to ApolloLink
+  // see https://www.apollographql.com/docs/react/basics/queries.html#graphql-config-options-context
+  context?: object;
+
+  // Render using either the `children`- or a `render`-prop callback
+  children?: RenderFunc<T> | React.ReactNode;
+  render?: RenderFunc<T>;
+};
+
+export type QueryContext = {
+  apollo?: any;
+};
 
 /**
  * Example:
@@ -14,18 +89,32 @@ import { isPlainObject } from "./util";
  *      : <UserList users={users} />
  * }</Query>
  */
-export class Query extends React.Component {
-  constructor(props) {
-    super(props);
+export class Query<T = any> extends React.Component<QueryProps<T>> {
+  static contextTypes = {
+    apollo: PropTypes.shape({
+      client: PropTypes.object.isRequired,
+      queued: PropTypes.array
+    }).isRequired
+  };
+
+  state = {
+    skipped: this.shouldSkip(this.props)
+  };
+
+  mounted = false;
+
+  subscription = null;
+  _o = null;
+  previousData = {};
+
+  constructor(props: QueryProps<T>, context: QueryContext) {
+    super(props, context);
     this.refetch = this.refetch.bind(this);
     this.fetchMore = this.fetchMore.bind(this);
-    this.state = {
-      skipped: this.shouldSkip(props)
-    };
   }
 
   componentWillMount() {
-    const { queued } = this.context.apollo || {};
+    const { queued = null } = this.context.apollo || {};
 
     // skip rendering if no
     if (!this.props.lazy && !this.state.skipped && queued) {
@@ -51,7 +140,7 @@ export class Query extends React.Component {
     }
   }
 
-  componentWillReceiveProps(nextProps, nextContext) {
+  componentWillReceiveProps(nextProps) {
     if (nextProps.gql !== this.props.gql) {
       return this.request(nextProps);
     }
@@ -70,7 +159,7 @@ export class Query extends React.Component {
     if (this._o) {
       return this._o;
     }
-    const { client } = this.context.apollo || {};
+    const { client = null } = this.context.apollo || {};
     if (!client) {
       throw new Error(
         "missing apollo client in context. is there a <Provider /> ancestor component?"
@@ -121,7 +210,7 @@ export class Query extends React.Component {
   //           : <Results {...results} />
   //    }
   //  />
-  shouldSkip(props) {
+  shouldSkip(props: QueryProps<T>): boolean {
     if (typeof props.skip === "function") {
       return !!props.skip(props.variables);
     } else if (typeof props.skip === "boolean") {
@@ -134,7 +223,7 @@ export class Query extends React.Component {
     const currentResult = this.observable.currentResult();
     const { loading, error } = currentResult;
     const { skipped } = this.state;
-    const data = {};
+    const data: any = {};
 
     // Let's do what we can to give the user data
     if (error) {
@@ -192,78 +281,22 @@ export class Query extends React.Component {
       throw state.error;
     }
 
+    let fn: RenderFunc<T> = this.props.render;
+    if (!fn && typeof this.props.children === "function") {
+      fn = this.props.children;
+    }
+
+    const args: RenderArgs<T> = Object.assign({}, state, {
+      refetch: this.refetch,
+      fetchMore: this.fetchMore
+    });
+
     // <Query render={() => {}}/> or <Query>{() => {}}</Query>
-    return (this.props.render || this.props.children)(
-      Object.assign({}, state, {
-        refetch: this.refetch,
-        fetchMore: this.fetchMore
-      })
-    );
+    return fn(args);
   }
 }
 
-Query.contextTypes = {
-  apollo: PropTypes.shape({
-    client: PropTypes.object.isRequired,
-    queued: PropTypes.array
-  }).isRequired
-};
-
-Query.propTypes = {
-  // A graphql-tag compiled gql query
-  gql: PropTypes.object.isRequired,
-
-  // Variables passed into the query
-  variables: PropTypes.object,
-
-  // Wait for loading to complete before rendering anything instead of
-  // passing loading boolean into the render callback
-  wait: PropTypes.bool,
-
-  // Lazy load server side
-  lazy: PropTypes.bool,
-
-  // Control if query should be skipped.
-  // Set to `true` and control the query using `refetch()`
-  // or to a function which accepts the current variables
-  // and returns a boolean controling if a request should
-  // be made. Rendering will still happen, with a skipped flag
-  skip: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
-
-  // Fail by throwing an exception and letting the React error boundary
-  // take care of it instead of passing the error into the render callback
-  fail: PropTypes.bool,
-
-  // The time interval (in milliseconds) on which this query should be
-  // refetched from the server.
-  pollInterval: PropTypes.number,
-
-  // Specifies the fetch policy to be used for this query
-  // see https://www.apollographql.com/docs/react/basics/queries.html#graphql-config-options-fetchPolicy
-  fetchPolicy: PropTypes.oneOf([
-    "cache-first",
-    "cache-and-network",
-    "network-only",
-    "cache-only"
-  ]),
-
-  // Specifies the error policy to be used for this query
-  // see https://www.apollographql.com/docs/react/basics/queries.html#graphql-config-options-errorPolicy
-  errorPolicy: PropTypes.oneOf(["none", "ignore", "all"]),
-
-  // Whether or not updates to the network status should trigger next on the observer of this query
-  notifyOnNetworkStatusChange: PropTypes.bool,
-
-  // Context to pass to ApolloLink
-  // see https://www.apollographql.com/docs/react/basics/queries.html#graphql-config-options-context
-  context: PropTypes.object,
-
-  // Render using either the `children`- or a `render`-prop callback
-  children: PropTypes.func,
-  render: PropTypes.func
-};
-
-const propsToOptions = ({
+function propsToOptions<T>({
   gql,
   variables,
   pollInterval,
@@ -271,26 +304,14 @@ const propsToOptions = ({
   errorPolicy,
   notifyOnNetworkStatusChange,
   context
-}) => ({
-  query: gql,
-  variables,
-  pollInterval,
-  fetchPolicy,
-  errorPolicy,
-  notifyOnNetworkStatusChange,
-  context
-});
-
-function shallowEquals(a, b) {
-  for (let key in a) if (a[key] !== b[key]) return false;
-  for (let key in b) if (!(key in a)) return false;
-  return true;
-}
-
-function debounce(fn) {
-  let x;
-  return function() {
-    cancelAnimationFrame(x);
-    x = requestAnimationFrame(fn.bind(null, arguments));
+}: QueryProps<T>) {
+  return {
+    query: gql,
+    variables,
+    pollInterval,
+    fetchPolicy,
+    errorPolicy,
+    notifyOnNetworkStatusChange,
+    context
   };
 }

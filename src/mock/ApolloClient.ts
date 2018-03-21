@@ -9,21 +9,23 @@
  *    <Layout>{children}</Layout>
  *  </Provider>
  */
-export class ApolloClient {
-  constructor(mocks) {
+export class ApolloClient<T> {
+  mocks: T[];
+
+  constructor(mocks: T[]) {
     this.mocks = mocks;
   }
 
-  async mutate(options) {}
+  async mutate() {}
 
-  watchQuery(options) {
+  watchQuery() {
     return {
-      refetch: async options => {},
-      fetchMore: async options => {},
+      refetch: async () => {},
+      fetchMore: async () => {},
       setOptions: () => {},
       getLastResult: () => {},
       currentResult: () => ({ loading: false, error: null, data: {} }),
-      subscribe: ({ next, error }) => ({
+      subscribe: ({}) => ({
         unsubscribe: () => {}
       })
     };

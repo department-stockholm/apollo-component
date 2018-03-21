@@ -36,8 +36,14 @@ export const renderState = (
 // renderElement is a very simple way to render a React element tree
 // without any magic. Since we keep track using the context we only
 // need the lifecycle method anyway.
-const renderElement = (element, context = {}) => {
-  if (Array.isArray(element)) {
+function renderElement(element: any, context = {}) {
+  if (
+    typeof element == "string" ||
+    typeof element == "number" ||
+    typeof element == "boolean"
+  ) {
+    // ignore basic elements
+  } else if (Array.isArray(element)) {
     // react 16 array of children
     element.forEach(c => c && renderElement(c, context));
   } else if (typeof element.type == "function") {
@@ -55,7 +61,7 @@ const renderElement = (element, context = {}) => {
       instance.state = instance.state || null;
       instance.setState = newState => {
         if (typeof newState === "function") {
-          newState = newState(instance.state, instance.props, instance.context);
+          newState = newState(instance.state, instance.props);
         }
         instance.state = Object.assign({}, instance.state, newState);
       };
@@ -79,4 +85,4 @@ const renderElement = (element, context = {}) => {
       c => c && renderElement(c, context)
     );
   }
-};
+}
