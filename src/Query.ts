@@ -4,8 +4,8 @@ import { DocumentNode } from "graphql";
 
 import { isPlainObject, debounce, shallowEquals } from "./util";
 
-export interface SkipFunc {
-  (vars: object): boolean;
+export interface SkipFunc<V> {
+  (vars: V): boolean;
 }
 
 export interface RenderArgs<T> {
@@ -21,12 +21,12 @@ export interface RenderFunc<T> {
   (args: RenderArgs<T>): React.ReactNode;
 }
 
-export type QueryProps<T> = {
+export type QueryProps<T, V> = {
   // A graphql-tag compiled gql query
   gql: DocumentNode;
 
   // Variables passed into the query
-  variables: object;
+  variables: V;
 
   // Wait for loading to complete before rendering anything instead of
   // passing loading boolean into the render callback
@@ -40,7 +40,7 @@ export type QueryProps<T> = {
   // or to a function which accepts the current variables
   // and returns a boolean controling if a request should
   // be made. Rendering will still happen, with a skipped flag
-  skip?: boolean | SkipFunc;
+  skip?: boolean | SkipFunc<V>;
 
   // Fail by throwing an exception and letting the React error boundary
   // take care of it instead of passing the error into the render callback
@@ -89,7 +89,9 @@ export type QueryContext = {
  *      : <UserList users={users} />
  * }</Query>
  */
-export class Query<T = any> extends React.Component<QueryProps<T>> {
+export class Query<T = any, V = object> extends React.Component<
+  QueryProps<T, V>
+> {
   static contextTypes = {
     apollo: PropTypes.shape({
       client: PropTypes.object.isRequired,
@@ -107,7 +109,7 @@ export class Query<T = any> extends React.Component<QueryProps<T>> {
   _o = null;
   previousData = {};
 
-  constructor(props: QueryProps<T>, context: QueryContext) {
+  constructor(props: QueryProps<T, V>, context: QueryContext) {
     super(props, context);
     this.refetch = this.refetch.bind(this);
     this.fetchMore = this.fetchMore.bind(this);
@@ -210,7 +212,7 @@ export class Query<T = any> extends React.Component<QueryProps<T>> {
   //           : <Results {...results} />
   //    }
   //  />
-  shouldSkip(props: QueryProps<T>): boolean {
+  shouldSkip(props: QueryProps<T, V>): boolean {
     if (typeof props.skip === "function") {
       return !!props.skip(props.variables);
     } else if (typeof props.skip === "boolean") {
@@ -296,7 +298,7 @@ export class Query<T = any> extends React.Component<QueryProps<T>> {
   }
 }
 
-function propsToOptions<T>({
+function propsToOptions<T, V>({
   gql,
   variables,
   pollInterval,
@@ -304,7 +306,7 @@ function propsToOptions<T>({
   errorPolicy,
   notifyOnNetworkStatusChange,
   context
-}: QueryProps<T>) {
+}: QueryProps<T, V>) {
   return {
     query: gql,
     variables,
