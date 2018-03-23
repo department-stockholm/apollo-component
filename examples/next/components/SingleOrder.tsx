@@ -2,7 +2,10 @@ import React from "react";
 import gql from "graphql-tag";
 import Link from "next/link";
 
-import { OrderRecordRow } from "./OrderRecord";
+import {
+  OrderRecordRow,
+  fragments as FragmentsOrderRecord
+} from "./OrderRecord";
 
 export const SingleOrder = ({ id, name, records }) => (
   <div id={id}>
@@ -14,7 +17,7 @@ export const SingleOrder = ({ id, name, records }) => (
   </div>
 );
 
-SingleOrder.fragments = {
+export const fragments = {
   SingleOrder: gql`
     fragment SingleOrder on Order {
       id
@@ -23,6 +26,6 @@ SingleOrder.fragments = {
         ...OrderRecordRow
       }
     }
-    ${OrderRecordRow.fragments.OrderRecordRow}
+    ${FragmentsOrderRecord.OrderRecordRow}
   `
 };

@@ -4,8 +4,15 @@ import gql from "graphql-tag";
 import { Query, Mutate } from "@department/apollo-component";
 
 import withApollo from "../components/withApollo";
-import { OrderRow, LoadingOrderRow } from "../components/OrderRow";
-import { SingleOrder } from "../components/SingleOrder";
+import {
+  OrderRow,
+  LoadingOrderRow,
+  fragments as FragmentsOrderRow
+} from "../components/OrderRow";
+import {
+  SingleOrder,
+  fragments as FragmentsOrder
+} from "../components/SingleOrder";
 
 const Root = ({ query }) =>
   query.error ? <Error /> : query.id ? <Show /> : <List skip={!!query.skip} />;
@@ -27,7 +34,7 @@ const List = ({ skip }) => (
           >
             Refetch w. count: 10
           </button>,
-          <button key="btn" type="button" onClick={refetch}>
+          <button key="btn" type="button" onClick={() => refetch()}>
             Refetch
           </button>,
           <button
@@ -57,12 +64,12 @@ const List = ({ skip }) => (
               <form
                 onSubmit={e => {
                   e.preventDefault();
-                  add({ name: e.currentTarget.elements.name.value });
+                  add({ name: e.currentTarget.elements["name"].value });
                 }}
               >
                 <input type="text" name="name" />
-                <button disabled={loading}>
-                  {loading ? "Saving..." : "Save"}
+                <button disabled={loading || !!error}>
+                  {loading ? "Saving..." : error ? "Failed!" : "Save"}
                 </button>
 
                 {createOrder ? `created ${createOrder.id}` : null}
@@ -132,17 +139,17 @@ const AddOrderMutation = gql`
 `;
 
 const ListOrderQuery = gql`
-  query ListOrder ($after: String, $count: Int = 2) {
+  query ListOrder($after: String, $count: Int = 2) {
     allOrders(first: $count, after: $after, orderBy: name_ASC) {
       ...OrderRow
     }
   }
-  ${OrderRow.fragments.OrderRow}
+  ${FragmentsOrderRow.OrderRow}
 `;
 
 const Show = withRouter(({ router: { query } }) => (
   <Query gql={ShowOrderQuery} variables={query} wait>
-    {({ data: { Order }, error, refetch }) =>
+    {({ data: { Order }, error }) =>
       error ? (
         <span>{error.message}</span>
       ) : !Order ? (
@@ -160,7 +167,7 @@ const ShowOrderQuery = gql`
       ...SingleOrder
     }
   }
-  ${SingleOrder.fragments.SingleOrder}
+  ${FragmentsOrder.SingleOrder}
 `;
 
 export default withApollo(Root);

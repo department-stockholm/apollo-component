@@ -3,7 +3,7 @@ import gql from "graphql-tag";
 
 export const OrderRecordRow = ({ title }) => <li>{title}</li>;
 
-OrderRecordRow.fragments = {
+export const fragments = {
   OrderRecordRow: gql`
     fragment OrderRecordRow on OrderRecord {
       id

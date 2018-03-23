@@ -14,13 +14,15 @@
   "license": "ISC",
   "dependencies": {
     "@department/apollo-component": "*",
-    "apollo-client-preset": "1.0.2",
+    "@zeit/next-typescript": "^0.0.11",
+    "apollo-client-preset": "1.0.8",
     "graphql": "^0.11.7",
     "graphql-tag": "^2.5.0",
     "isomorphic-unfetch": "^2.0.0",
-    "next": "^4.1.4",
+    "next": "canary",
     "prop-types": "^15.6.0",
     "react": "^16.0.0",
-    "react-dom": "^16.0.0"
+    "react-dom": "^16.0.0",
+    "typescript": "^2.7.2"
   }
 }

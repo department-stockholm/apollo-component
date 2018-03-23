@@ -1,12 +1,20 @@
-import { Router } from "next/router";
 import fetch from "isomorphic-unfetch";
 import React from "react";
 import PropTypes from "prop-types";
 import { Provider, renderState } from "@department/apollo-component";
 import ApolloClient, { ApolloLink, HttpLink } from "apollo-client-preset";
 
-export default Component =>
-  class extends React.Component {
+type P = {
+  state: any;
+  url: { query: object };
+};
+
+export default (
+  Component: React.ComponentType<{ query: object }> & {
+    getInitialProps?: (ctx: any) => any;
+  }
+) =>
+  class extends React.Component<P> {
     static displayName = `withApollo(${Component.displayName ||
       Component.name ||
       "<unnamed>"})`;
@@ -68,7 +76,7 @@ export default Component =>
 
 // RouterContext emulates the App component used in next in that it
 // adds a router object to the context
-class RouterContext extends React.Component {
+class RouterContext extends React.Component<{ router: object }> {
   static childContextTypes = {
     router: PropTypes.object
   };
@@ -84,7 +92,7 @@ class RouterContext extends React.Component {
   }
 }
 
-const createClient = (opts = {}, state) => {
+const createClient = (opts: { ssrMode?: boolean; token?: string }, state?) => {
   const client = new ApolloClient({
     link: ApolloLink.from([logs(opts), auth(opts), http(opts)]),
     ...opts
@@ -96,17 +104,17 @@ const createClient = (opts = {}, state) => {
   return client;
 };
 
-const http = () =>
+const http = ({}) =>
   new HttpLink({
     fetch,
     uri: "https://api.graph.cool/simple/v1/ciy1yx99701ou0147zvkyb6w5"
   });
 
-const auth = ({ token }) =>
+const auth = ({ token = null }: { token?: string }) =>
   new ApolloLink((operation, forward) => {
     operation.setContext({
       headers: {
-        authorization: token || null
+        authorization: token
       }
     });
     return forward(operation);
