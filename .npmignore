@@ -2,5 +2,7 @@
 !src/**/*
 !dist/*
 !mock.js
+!mock.js.map
 !state.js
+!state.js.map
 !package.json
