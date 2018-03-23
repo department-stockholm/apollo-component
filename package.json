@@ -9,6 +9,7 @@
   "module": "dist/index.esm.mjs",
   "browser": "dist/index.umd.js",
   "umd:main": "dist/index.umd.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
     "watch": "microbundle watch --strict --no-compress",

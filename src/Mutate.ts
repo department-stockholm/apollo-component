@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { DocumentNode } from "graphql";
 
 import { isPlainObject } from "./util";
 
@@ -13,7 +14,7 @@ export interface MutateRenderFunc<T, V> {
 
 export type MutateProps<T, V> = {
   // A graphql-tag compiled gql query
-  gql: object;
+  gql: DocumentNode;
 
   // Default variables passed into the Mutation (when no variables
   // are passed into the mutation callback).
@@ -21,24 +22,24 @@ export type MutateProps<T, V> = {
   // passed into the mutate call and return the variables to use in
   // the request.
   // ex. <Mutate variables={(vars) => ({...vars, id: "1"})} />
-  variables: V | VariablesFunc<V>;
+  variables?: V | VariablesFunc<V>;
 
   // Fail by throwing an exception and letting the React error boundary
   // take care of it instead of passing the error into the render callback
-  fail: boolean;
+  fail?: boolean;
 
   // see https://www.apollographql.com/docs/react/basics/mutations.html#graphql-mutation-options-refetchQueries
-  refetchQueries: string[];
+  refetchQueries?: string[];
 
   // see https://www.apollographql.com/docs/react/basics/mutations.html#graphql-mutation-options-optimisticResponse
-  optimisticResponse: Function;
+  optimisticResponse?: Function;
 
   // see https://www.apollographql.com/docs/react/basics/mutations.html#graphql-mutation-options-update
-  update: Function;
+  update?: Function;
 
   // Render using either the `children`- or a `render`-prop callback
-  children: MutateRenderFunc<T, V> | React.ReactNode;
-  render: MutateRenderFunc<T, V>;
+  children?: MutateRenderFunc<T, V> | React.ReactNode;
+  render?: MutateRenderFunc<T, V>;
 };
 
 export type MutateState<T> = {

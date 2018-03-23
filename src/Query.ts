@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { DocumentNode } from "graphql";
+import { DocumentNode, GraphQLError } from "graphql";
 
 import { isPlainObject, debounce, shallowEquals } from "./util";
 
@@ -8,25 +8,36 @@ export interface SkipFunc<V> {
   (vars: V): boolean;
 }
 
-export interface RenderArgs<T> {
-  data: T;
+export interface RenderArgs<T, V> {
+  data: T | {};
   error?: Error;
   skipped: boolean;
   loading: boolean;
-  refetch: Function;
-  fetchMore: Function;
+  refetch: (variables?: V) => Promise<ApolloQueryResult<T>>;
+  fetchMore: (
+    opts: { variables?: V; updateQuery?: () => T }
+  ) => Promise<ApolloQueryResult<T>>;
 }
 
-export interface RenderFunc<T> {
-  (args: RenderArgs<T>): React.ReactNode;
+export interface RenderFunc<T, V> {
+  (args: RenderArgs<T, V>): React.ReactNode;
 }
+
+// TODO use the real result from apollo-client
+export type ApolloQueryResult<T> = {
+  data: T;
+  errors?: GraphQLError[];
+  loading: boolean;
+  networkStatus: any; // actually an enum: https://github.com/apollographql/apollo-client/blob/master/packages/apollo-client/src/core/networkStatus.ts
+  stale: boolean;
+};
 
 export type QueryProps<T, V> = {
   // A graphql-tag compiled gql query
   gql: DocumentNode;
 
   // Variables passed into the query
-  variables: V;
+  variables?: V;
 
   // Wait for loading to complete before rendering anything instead of
   // passing loading boolean into the render callback
@@ -70,12 +81,12 @@ export type QueryProps<T, V> = {
   context?: object;
 
   // Render using either the `children`- or a `render`-prop callback
-  children?: RenderFunc<T> | React.ReactNode;
-  render?: RenderFunc<T>;
+  children?: RenderFunc<T, V> | React.ReactNode;
+  render?: RenderFunc<T, V>;
 };
 
 export type QueryContext = {
-  apollo?: any;
+  apollo: { client: any; queued?: any[] };
 };
 
 /**
@@ -102,6 +113,8 @@ export class Query<T = any, V = object> extends React.Component<
   state = {
     skipped: this.shouldSkip(this.props)
   };
+
+  context: QueryContext;
 
   mounted = false;
 
@@ -142,7 +155,7 @@ export class Query<T = any, V = object> extends React.Component<
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps: QueryProps<T, V>) {
     if (nextProps.gql !== this.props.gql) {
       return this.request(nextProps);
     }
@@ -170,7 +183,7 @@ export class Query<T = any, V = object> extends React.Component<
     return (this._o = client.watchQuery(propsToOptions(this.props)));
   }
 
-  request(props) {
+  request(props: QueryProps<T, V>) {
     const skipped = this.shouldSkip(props);
     // set state to make sure we render even
     // if the request is skipped
@@ -283,12 +296,12 @@ export class Query<T = any, V = object> extends React.Component<
       throw state.error;
     }
 
-    let fn: RenderFunc<T> = this.props.render;
+    let fn: RenderFunc<T, V> = this.props.render;
     if (!fn && typeof this.props.children === "function") {
       fn = this.props.children;
     }
 
-    const args: RenderArgs<T> = Object.assign({}, state, {
+    const args: RenderArgs<T, V> = Object.assign({}, state, {
       refetch: this.refetch,
       fetchMore: this.fetchMore
     });
